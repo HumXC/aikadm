@@ -38,7 +38,6 @@
             ]) ++ (with astal;[
             greet
             io
-
           ]);
           shellHook = ''
             export PKG_CONFIG_PATH=$(pkg-config --variable pc_path pkg-config)

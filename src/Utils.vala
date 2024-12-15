@@ -39,13 +39,13 @@ namespace Utils {
 
     public string get_wallpaper(string wallpaper, int monitor) {
         string get_ext(string f) {
-            int dot_index = f.index_of(".", 0);
+            int dot_index = f.last_index_of(".", 0);
             if (dot_index >= 0)return f.substring(dot_index + 1);
             return "";
         }
 
         string get_name(string f) {
-            int dot_index = f.index_of(".", 0);
+            int dot_index = f.last_index_of(".", 0);
             if (dot_index >= 0)return f.substring(0, dot_index);
             return "";
         }
@@ -67,15 +67,15 @@ namespace Utils {
         }
         var dir = Dir.open(wallpaper, 0);
         var images = new Array<string> ();
-        var file_name = Path.build_path(wallpaper, dir.read_name());
-        while (file_name != null) {
+        while (true) {
+            var base_name = dir.read_name();
+            if (base_name == null)break;
+            var file_name = Path.build_path("/", wallpaper, base_name);
             var f = File.new_for_path(file_name);
             if (f.query_file_type(GLib.FileQueryInfoFlags.NONE, null) == GLib.FileType.DIRECTORY) {
-                file_name = dir.read_name();
                 continue;
             }
             if (!isImg(get_ext(file_name))) {
-                file_name = dir.read_name();
                 continue;
             }
             if (get_name(file_name) == monitor.to_string()) {
@@ -83,10 +83,19 @@ namespace Utils {
             }
             images.append_val(file_name);
             file_name = dir.read_name();
-            continue;
         }
         if (images.length == 0)return "";
         var index = Random.int_range(0, (int32) images.length - 1);
         return images.index(index);
+    }
+
+    public double max(double a, double b) {
+        if (a > b)return a;
+        return b;
+    }
+
+    public double min(double a, double b) {
+        if (a < b)return a;
+        return b;
     }
 }

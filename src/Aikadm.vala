@@ -59,24 +59,20 @@ private class AikadmWindow : Gtk.Window {
         var img = Utils.get_wallpaper (option.wallpaper, 0);
         if (img == "")return;
         var pixbuf = new Gdk.Pixbuf.from_file (img);
-
         background.set_paintable (Gdk.Texture.for_pixbuf (scale_and_center (pixbuf, width, height)));
     }
 }
 // 缩放并居中平铺图像的函数
 private Gdk.Pixbuf scale_and_center (Gdk.Pixbuf pixbuf, int target_width, int target_height) {
-    double max (double a, double b) {
-        if (a > b)return a;
-        return b;
-    }
-
     int original_width = pixbuf.get_width ();
     int original_height = pixbuf.get_height ();
-    double scale_x = (double) target_width / original_width;
-    double scale_y = (double) target_height / original_height;
-    double scale_factor = max (scale_x, scale_y);
+    double scale_x = (double) target_width / (double) original_width;
+    double scale_y = (double) target_height / (double) original_height;
+    double scale_factor = Utils.max (scale_x, scale_y);
     int new_width = (int) (original_width * scale_factor);
     int new_height = (int) (original_height * scale_factor);
+    if ((new_width - target_width).abs () <= 1)new_width = target_width;
+    if ((new_height - target_height).abs () <= 1)new_height = target_height;
 
     var scaled_pixbuf = new Gdk.Pixbuf (Gdk.Colorspace.RGB, true, 8, new_width, new_height);
     pixbuf.scale (
