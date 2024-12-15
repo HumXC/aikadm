@@ -2,12 +2,11 @@ using Gtk 4.0;
 template $AikadmWindow : Gtk.Window {
     can-focus: true;
     title: "Aikadm";
-    activate-default => $test();
     Overlay  {
         hexpand: true;
         vexpand: true;
         [overlay]
-        Box background {  }
+        Picture background {  }
         [overlay]
         Label name {
            label: "---------";

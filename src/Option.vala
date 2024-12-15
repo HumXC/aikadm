@@ -29,6 +29,9 @@ public struct  Option {
     }
 
     public Option (string[] args) {
+        wallpaper = "";
+        defaultUser = "";
+        defaultSession = "";
         var ctx = new GLib.OptionContext ();
         ctx.add_main_entries ({
             {
@@ -36,7 +39,7 @@ public struct  Option {
                 'w',
                 GLib.OptionFlags.NONE,
                 GLib.OptionArg.STRING,
-                ref defaultUser,
+                ref wallpaper,
                 "A file path or a directory path to set as wallpaper",
                 "DIR|FILE"
             },
@@ -63,7 +66,7 @@ public struct  Option {
                 'm',
                 GLib.OptionFlags.NONE,
                 GLib.OptionArg.INT,
-                ref defaultSession,
+                ref defaultMonitor,
                 "Default display monitor",
                 "INTEGER"
             },

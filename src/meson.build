@@ -17,9 +17,9 @@ sources += gnome.compile_resources(
 deps = [
     dependency('gtk4-layer-shell-0'),
     dependency('gtk4'),
-    dependency('glib-2.0'),
     dependency('astal-greet-0.1'),
     dependency('astal-io-0.1'),
+    dependency('gdk-pixbuf-2.0'),
 ]
 executable(
     'aikadm',

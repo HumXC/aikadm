@@ -15,24 +15,27 @@
       in
       {
         devShells.default = pkgs.mkShell rec{
-          buildInputs = (with pkgs; [
-            # Build-Tools
-            pkg-config
-            vala
-            vala-lint
-            meson
-            ninja
-            mesonlsp
-            vala-language-server
-            uncrustify
-            blueprint-compiler
-            sass
-            # Dependencies
-            gtk4
-            glib
-            gtk4-layer-shell
-            libgee
-          ]) ++ (with astal;[
+          buildInputs = (with pkgs;
+            [
+              # Build-Tools
+              pkg-config
+              vala
+              vala-lint
+              meson
+              ninja
+              mesonlsp
+              vala-language-server
+              uncrustify
+              blueprint-compiler
+              sass
+              # Dependencies
+              gtk4
+              glib
+              gtk4-layer-shell
+              libgee
+              gdk-pixbuf
+              wlroots
+            ]) ++ (with astal;[
             greet
             io
 

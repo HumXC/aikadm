@@ -33,7 +33,7 @@ private class AikadmWindow : Gtk.Window {
     public List<Passwd?> users;
 
     [GtkChild]
-    private unowned Gtk.Box background;
+    private unowned Gtk.Picture background;
     [GtkChild]
     private unowned Gtk.Label name;
 
@@ -41,8 +41,8 @@ private class AikadmWindow : Gtk.Window {
         this.option = option;
         this.sessions = sessions.copy_deep ((s) => s);
         this.users = users.copy_deep ((u) => u);
-
-        ListModel monitors = Gdk.Display.get_default ().get_monitors ();
+        var display = Gdk.Display.get_default ();
+        ListModel monitors = display.get_monitors ();
         Gdk.Monitor m = (Gdk.Monitor) monitors.get_item (monitor);
         GtkLayerShell.init_for_window (this);
         GtkLayerShell.set_monitor (this, m);
@@ -52,17 +52,56 @@ private class AikadmWindow : Gtk.Window {
         GtkLayerShell.set_anchor (this, GtkLayerShell.Edge.TOP, true);
         GtkLayerShell.set_anchor (this, GtkLayerShell.Edge.RIGHT, true);
         GtkLayerShell.set_anchor (this, GtkLayerShell.Edge.BOTTOM, true);
+        var rect = m.get_geometry ();
+        var scale = m.get_scale ();
+        var width = (int) (rect.width * scale);
+        var height = (int) (rect.height * scale);
+        var img = Utils.get_wallpaper (option.wallpaper, 0);
+        if (img == "")return;
+        var pixbuf = new Gdk.Pixbuf.from_file (img);
 
-        this.name.label = "DD";
+        background.set_paintable (Gdk.Texture.for_pixbuf (scale_and_center (pixbuf, width, height)));
+    }
+}
+// 缩放并居中平铺图像的函数
+private Gdk.Pixbuf scale_and_center (Gdk.Pixbuf pixbuf, int target_width, int target_height) {
+    double max (double a, double b) {
+        if (a > b)return a;
+        return b;
     }
 
-    [GtkCallback]
-    public void test () {
-        Timeout.add_seconds (1,
-                             () => {
-            print ("|||%s", name.label);
-            name.label = "SSSS";
-            return false;
-        }, Priority.DEFAULT);
-    }
+    int original_width = pixbuf.get_width ();
+    int original_height = pixbuf.get_height ();
+    double scale_x = (double) target_width / original_width;
+    double scale_y = (double) target_height / original_height;
+    double scale_factor = max (scale_x, scale_y);
+    int new_width = (int) (original_width * scale_factor);
+    int new_height = (int) (original_height * scale_factor);
+
+    var scaled_pixbuf = new Gdk.Pixbuf (Gdk.Colorspace.RGB, true, 8, new_width, new_height);
+    pixbuf.scale (
+                  scaled_pixbuf,
+                  0,
+                  0,
+                  new_width,
+                  new_height,
+                  0,
+                  0,
+                  scale_factor,
+                  scale_factor,
+                  Gdk.InterpType.HYPER);
+
+    var final_pixbuf = new Gdk.Pixbuf (Gdk.Colorspace.RGB, true, 8, target_width, target_height);
+
+    int offset_x = (new_width - target_width) / 2;
+    int offset_y = (new_height - target_height) / 2;
+    scaled_pixbuf.copy_area (
+                             offset_x,
+                             offset_y,
+                             target_width,
+                             target_height,
+                             final_pixbuf,
+                             0,
+                             0);
+    return final_pixbuf;
 }
