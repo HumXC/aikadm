@@ -8,15 +8,4 @@ project(
     'werror=false',
   ],
 )
-deps = [
-  dependency('gtk4'),
-]
-sources = [
-  'src/Aikadm.vala',
-]
-
-executable(
-  'aikadm',
-  sources,
-  dependencies: deps,
-)
+subdir('src')

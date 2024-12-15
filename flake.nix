@@ -15,7 +15,8 @@
       in
       {
         devShells.default = pkgs.mkShell rec{
-          buildInputs = with pkgs; [
+          buildInputs = (with pkgs; [
+            # Build-Tools
             pkg-config
             vala
             vala-lint
@@ -23,13 +24,18 @@
             ninja
             mesonlsp
             vala-language-server
-            gst
             uncrustify
+            blueprint-compiler
+            sass
+            # Dependencies
             gtk4
             glib
             gtk4-layer-shell
-          ] ++ (with astal;[
+            libgee
+          ]) ++ (with astal;[
             greet
+            io
+
           ]);
           shellHook = ''
             export PKG_CONFIG_PATH=$(pkg-config --variable pc_path pkg-config)
