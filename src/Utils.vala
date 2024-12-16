@@ -88,14 +88,4 @@ namespace Utils {
         var index = Random.int_range(0, (int32) images.length - 1);
         return images.index(index);
     }
-
-    public double max(double a, double b) {
-        if (a > b)return a;
-        return b;
-    }
-
-    public double min(double a, double b) {
-        if (a < b)return a;
-        return b;
-    }
 }

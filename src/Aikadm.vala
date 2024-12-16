@@ -16,7 +16,6 @@ public class Aikadm : Gtk.Application {
             window.show ();
             window.setKey ();
         }
-
         this.hold ();
     }
 
@@ -36,7 +35,6 @@ private class AikadmWindow : Gtk.Window {
 
     [GtkChild]
     private unowned Gtk.Picture background;
-
     public AikadmWindow (AstalIO.Variable currentMonitor, int monitor, Option option, List<Utils.Session> sessions, List<Passwd?> users) {
         this.option = option;
         this.sessions = sessions.copy_deep ((s) => s);
@@ -96,9 +94,9 @@ private Gdk.Pixbuf scale_and_center (Gdk.Pixbuf pixbuf, int target_width, int ta
     int original_height = pixbuf.get_height ();
     double scale_x = (double) target_width / (double) original_width;
     double scale_y = (double) target_height / (double) original_height;
-    double scale_factor = Utils.max (scale_x, scale_y);
-    int new_width = (int) (original_width * scale_factor);
-    int new_height = (int) (original_height * scale_factor);
+    double scale_factor = Math.fmax (scale_x, scale_y);
+    int new_width = (int) Math.floor (original_width * scale_factor);
+    int new_height = (int) Math.floor (original_height * scale_factor);
     if ((new_width - target_width).abs () <= 1)new_width = target_width;
     if ((new_height - target_height).abs () <= 1)new_height = target_height;
 

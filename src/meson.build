@@ -25,4 +25,5 @@ executable(
     'aikadm',
     sources,
     dependencies: deps,
+    link_args: ['-lm'],
 )

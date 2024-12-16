@@ -1,20 +1,21 @@
-#!/usr/bin/env valac -S gtk4
+#! /usr/bin/env -S vala --pkg gtk4
 public class App : Gtk.Application {
     public App () {
         Object (application_id: "com.example");
     }
 
     public override void activate () {
-        var window = new Window();
-        window.show();
+        var window = new Window ();
+        window.show ();
         this.hold ();
     }
+
     public static int main (string[] args) {
         var app = new App ();
         return app.run (args);
     }
 }
-private class  Window : Gtk.Window {
+private class Window : Gtk.Window {
     public Window () {
         var tri = Gtk.ShortcutTrigger.parse_string ("q");
         var act = Gtk.ShortcutAction.parse_string ("nothing");
@@ -25,4 +26,3 @@ private class  Window : Gtk.Window {
         this.add_controller (shctl);
     }
 }
- 
