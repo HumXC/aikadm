@@ -12,7 +12,9 @@ public class Aikadm : Gtk.Application {
         var currentMonitor = new AstalIO.Variable (0);
         var monitors = Gdk.Display.get_default ().get_monitors ();
         for (var i = 0; i < monitors.get_n_items (); i++) {
-            new AikadmWindow (currentMonitor, i, option, sessions, users).show ();
+            var window = new AikadmWindow (currentMonitor, i, option, sessions, users);
+            window.show ();
+            window.setKey ();
         }
 
         this.hold ();
@@ -34,8 +36,6 @@ private class AikadmWindow : Gtk.Window {
 
     [GtkChild]
     private unowned Gtk.Picture background;
-    [GtkChild]
-    private unowned Gtk.Label name;
 
     public AikadmWindow (AstalIO.Variable currentMonitor, int monitor, Option option, List<Utils.Session> sessions, List<Passwd?> users) {
         this.option = option;
@@ -45,15 +45,21 @@ private class AikadmWindow : Gtk.Window {
         ListModel monitors = display.get_monitors ();
         Gdk.Monitor m = (Gdk.Monitor) monitors.get_item (monitor);
         GtkLayerShell.init_for_window (this);
+        GtkLayerShell.set_keyboard_mode (this, GtkLayerShell.KeyboardMode.EXCLUSIVE);
         GtkLayerShell.set_monitor (this, m);
-        GtkLayerShell.set_layer (this, GtkLayerShell.Layer.BACKGROUND);
+        GtkLayerShell.set_layer (this, GtkLayerShell.Layer.TOP);
         GtkLayerShell.set_exclusive_zone (this, 1);
         GtkLayerShell.set_anchor (this, GtkLayerShell.Edge.LEFT, true);
         GtkLayerShell.set_anchor (this, GtkLayerShell.Edge.TOP, true);
         GtkLayerShell.set_anchor (this, GtkLayerShell.Edge.RIGHT, true);
         GtkLayerShell.set_anchor (this, GtkLayerShell.Edge.BOTTOM, true);
+
+        Timeout.add_seconds_once (5, () => {
+            this.destroy ();
+        });
+
         var rect = m.get_geometry ();
-        var scale = m.get_scale ();
+        var scale = 1;
         var width = (int) (rect.width * scale);
         var height = (int) (rect.height * scale);
         var img = Utils.get_wallpaper (option.wallpaper, 0);
@@ -61,8 +67,30 @@ private class AikadmWindow : Gtk.Window {
         var pixbuf = new Gdk.Pixbuf.from_file (img);
         background.set_paintable (Gdk.Texture.for_pixbuf (scale_and_center (pixbuf, width, height)));
     }
+
+    public void setKey () {
+        // this: Gtk.Window
+        var action_group = new SimpleActionGroup ();
+        action_group.add_action_entries ({
+            {
+                "test", () => {
+                    print ("Triggered test action\n");
+                }
+            },
+        }, this);
+
+        // this.insert_action_group ("win", action_group);
+
+        var tri = Gtk.ShortcutTrigger.parse_string ("Escape");
+        var act = Gtk.ShortcutAction.parse_string ("action(win.test)");
+        var sh = new Gtk.Shortcut (tri, act);
+
+        var shctl = new Gtk.ShortcutController ();
+        shctl.add_shortcut (sh);
+        this.add_controller (shctl);
+    }
 }
-// 缩放并居中平铺图像的函数
+
 private Gdk.Pixbuf scale_and_center (Gdk.Pixbuf pixbuf, int target_width, int target_height) {
     int original_width = pixbuf.get_width ();
     int original_height = pixbuf.get_height ();
@@ -77,12 +105,10 @@ private Gdk.Pixbuf scale_and_center (Gdk.Pixbuf pixbuf, int target_width, int ta
     var scaled_pixbuf = new Gdk.Pixbuf (Gdk.Colorspace.RGB, true, 8, new_width, new_height);
     pixbuf.scale (
                   scaled_pixbuf,
-                  0,
-                  0,
+                  0, 0,
                   new_width,
                   new_height,
-                  0,
-                  0,
+                  0, 0,
                   scale_factor,
                   scale_factor,
                   Gdk.InterpType.HYPER);
@@ -97,7 +123,6 @@ private Gdk.Pixbuf scale_and_center (Gdk.Pixbuf pixbuf, int target_width, int ta
                              target_width,
                              target_height,
                              final_pixbuf,
-                             0,
-                             0);
+                             0, 0);
     return final_pixbuf;
 }

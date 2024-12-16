@@ -18,12 +18,13 @@
           buildInputs = (with pkgs;
             [
               # Build-Tools
+              lldb
               pkg-config
               vala
               vala-lint
               meson
-              ninja
               mesonlsp
+              ninja
               vala-language-server
               uncrustify
               blueprint-compiler
@@ -40,7 +41,7 @@
             io
           ]);
           shellHook = ''
-            export PKG_CONFIG_PATH=$(pkg-config --variable pc_path pkg-config)
+            echo "${pkgs.lldb}"
           '';
         };
       }
