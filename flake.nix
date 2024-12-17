@@ -41,7 +41,7 @@
             io
           ]);
           shellHook = ''
-            echo "${pkgs.lldb}"
+            echo "${pkgs.lldb}/bin/lldb-dap"
           '';
         };
       }

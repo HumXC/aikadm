@@ -92,7 +92,7 @@ public struct  Option {
                 "debug",
                 '\0',
                 GLib.OptionFlags.NONE,
-                GLib.OptionArg.STRING_ARRAY,
+                GLib.OptionArg.NONE,
                 ref debug,
                 "Enable debug mode",
                 null

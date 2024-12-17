@@ -6,6 +6,7 @@ sources = [
     'Aikadm.vala',
     'Utils.vala',
     'Option.vala',
+    'Window.vala',
 ]
 
 sources += gnome.compile_resources(
