@@ -9,4 +9,6 @@ project(
   ],
   default_options: ['buildtype=debug'],
 )
+sources = []
+subdir('data')
 subdir('src')

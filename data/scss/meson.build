@@ -3,7 +3,7 @@ sass = find_program('sass')
 scss_deps = files( )
 
 scss = custom_target(
-    'scss',
+    'generate-css',
     input: 'main.scss',
     output: 'style.css',
     command: [

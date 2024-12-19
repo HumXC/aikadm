@@ -3,32 +3,33 @@
 public class AikadmWindow : Gtk.Window  {
     public Option option;
     public List<Utils.Session> sessions;
-    public List<Passwd?> users;
+    public List<Utils.User> users;
     public AstalIO.Variable currentMonitor;
+    public int monitor;
     public AstalIO.Variable isInput = new AstalIO.Variable (false);
     [GtkChild]
     private unowned Gtk.Picture background;
-    public AikadmWindow (AstalIO.Variable currentMonitor, int monitor, Option option, List<Utils.Session> sessions, List<Passwd?> users) {
+    [GtkChild]
+    private unowned Gtk.Revealer dateTimeRevealer;
+    public AikadmWindow (AstalIO.Variable currentMonitor, int monitor, Option option, List<Utils.Session> sessions, List<Utils.User> users) {
+        Object (title: "aikadm", css_name: "window", name: "aikadm");
         this.option = option;
         this.sessions = sessions.copy_deep ((s) => s);
         this.users = users.copy_deep ((u) => u);
         this.currentMonitor = currentMonitor;
-        var display = Gdk.Display.get_default ();
+        this.monitor = monitor;
+        keyBind ();
+        setLayer ();
+        setWallpaper ();
+        Idle.add_once (() => dateTimeRevealer.set_reveal_child (true));
+        isInput.changed.connect (() => {
+            dateTimeRevealer.set_reveal_child (!isInput.value.get_boolean ());
+        });
+    }
+
+    private void setWallpaper () {
         ListModel monitors = display.get_monitors ();
         Gdk.Monitor m = (Gdk.Monitor) monitors.get_item (monitor);
-        GtkLayerShell.init_for_window (this);
-        GtkLayerShell.set_keyboard_mode (this, GtkLayerShell.KeyboardMode.ON_DEMAND);
-        GtkLayerShell.set_monitor (this, m);
-        GtkLayerShell.set_layer (this, GtkLayerShell.Layer.TOP);
-        // GtkLayerShell.set_layer (this, GtkLayerShell.Layer.BACKGROUND);
-        GtkLayerShell.set_exclusive_zone (this, 1);
-        GtkLayerShell.set_anchor (this, GtkLayerShell.Edge.LEFT, true);
-        GtkLayerShell.set_anchor (this, GtkLayerShell.Edge.TOP, true);
-        GtkLayerShell.set_anchor (this, GtkLayerShell.Edge.RIGHT, true);
-        GtkLayerShell.set_anchor (this, GtkLayerShell.Edge.BOTTOM, true);
-        Timeout.add_seconds_once (3, () => {
-            this.destroy ();
-        });
         var rect = m.get_geometry ();
         var scale = 1;
         var width = (int) (rect.width * scale);
@@ -39,27 +40,48 @@ public class AikadmWindow : Gtk.Window  {
         background.set_paintable (Gdk.Texture.for_pixbuf (scale_and_center (pixbuf, width, height)));
     }
 
-    construct  {
+    private void setLayer () {
+        ListModel monitors = display.get_monitors ();
+        Gdk.Monitor m = (Gdk.Monitor) monitors.get_item (monitor);
+        GtkLayerShell.init_for_window (this);
+        GtkLayerShell.set_keyboard_mode (this, GtkLayerShell.KeyboardMode.ON_DEMAND);
+        GtkLayerShell.set_monitor (this, m);
+        GtkLayerShell.set_layer (this, GtkLayerShell.Layer.TOP);
+        GtkLayerShell.set_layer (this, GtkLayerShell.Layer.BACKGROUND); // TESTING only
+        GtkLayerShell.set_exclusive_zone (this, 1);
+        GtkLayerShell.set_anchor (this, GtkLayerShell.Edge.LEFT, true);
+        GtkLayerShell.set_anchor (this, GtkLayerShell.Edge.TOP, true);
+        GtkLayerShell.set_anchor (this, GtkLayerShell.Edge.RIGHT, true);
+        GtkLayerShell.set_anchor (this, GtkLayerShell.Edge.BOTTOM, true);
+    }
+
+    private void keyBind () {
         var action_group = new SimpleActionGroup ();
         action_group.add_action_entries ({
             { "escape", () => {
-                  if (this.option.debug && !this.isInput.value.get_boolean ())this.destroy ();
-                  this.isInput.value.set_boolean (false);
+                  if (this.option.debug && !this.isInput.value.get_boolean ()) {
+                      this.destroy ();
+                      return;
+                  }
+                  this.isInput.value = false;
               } },
             { "enter", () => {
                   if (!this.isInput.value.get_boolean ()) {
-                      this.isInput.value.set_boolean (true);
+                      this.isInput.value = true;
                   }
               } },
         }, this);
 
         this.insert_action_group ("win", action_group);
+        var binds = new Gtk.Shortcut[] {
+            new Gtk.Shortcut (new Gtk.KeyvalTrigger (Gdk.Key.Escape, 0), new Gtk.NamedAction ("win.escape")),
+            new Gtk.Shortcut (new Gtk.KeyvalTrigger (Gdk.Key.Return, 0), new Gtk.NamedAction ("win.enter")),
+        };
 
-        var tri = new Gtk.KeyvalTrigger (Gdk.Key.Escape, 0);
-        var act = new Gtk.NamedAction ("win.escape");
-        var sh = new Gtk.Shortcut (tri, act);
         var shctl = new Gtk.ShortcutController ();
-        shctl.add_shortcut (sh);
+        foreach (var sh in binds) {
+            shctl.add_shortcut (sh);
+        }
         ((Gtk.Widget) this).add_controller (shctl);
     }
 }

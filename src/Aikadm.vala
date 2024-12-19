@@ -5,8 +5,15 @@ public class Aikadm : Gtk.Application {
 
     public Option option;
     public override void activate () {
+        base.activate ();
+        Gtk.CssProvider provider = new Gtk.CssProvider ();
+        provider.load_from_resource ("com/github/humxc/aikadm/style.css");
+        Gtk.StyleContext.add_provider_for_display (
+                                                   Gdk.Display.get_default (),
+                                                   provider,
+                                                   Gtk.STYLE_PROVIDER_PRIORITY_USER);
         var users = Utils.get_users ();
-        foreach (var u in users)print ("User: %s\n", u.pw_name);
+        foreach (var u in users)print ("User: %s\n", u.name);
         var sessions = Utils.get_sessions ({ "/nix/store/p0aydfnn5bq4slmjl8v7pbskgxxwn4bi-desktops/share/wayland-sessions" });
         foreach (var u in sessions)print ("Session: %s\n", u.name);
         var currentMonitor = new AstalIO.Variable (0);
@@ -17,7 +24,7 @@ public class Aikadm : Gtk.Application {
             ((Gtk.Widget) window).destroy.connect (() => {
                 this.quit ();
             });
-            window.show ();
+            window.present ();
         }
         this.hold ();
     }

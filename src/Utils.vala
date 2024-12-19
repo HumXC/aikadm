@@ -1,10 +1,26 @@
 namespace Utils {
-    public List<Passwd?> get_users() {
-        var users = new List<Passwd?> ();
+    public class User {
+        public string name;
+        public string passwd;
+        public int uid;
+        public int gid;
+        public string dir;
+        public string shell;
+    }
+    public List<User> get_users() {
+        var users = new List<User> ();
         for (var i = 1000; i <= 2000; i++) {
-            var u = getpwuid(i);
+            unowned var u = Posix.getpwuid(i);
             if (u != null) {
-                users.append(*u);
+                var copied = new User() {
+                    name = u.pw_name,
+                    passwd = u.pw_passwd,
+                    uid = (int) u.pw_uid,
+                    gid = (int) u.pw_gid,
+                    dir = u.pw_dir,
+                    shell = u.pw_shell
+                };
+                users.append(copied);
             }
         }
         return users;
