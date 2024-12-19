@@ -1,7 +1,8 @@
 blueprints = custom_target(
     'blueprints',
     input: files(
-        'Window.blp',
+        'date-time.blp',
+        'window.blp',
     ),
     output: '.',
     command: [

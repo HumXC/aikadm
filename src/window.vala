@@ -1,9 +1,8 @@
-
-[GtkTemplate (ui = "/com/github/humxc/aikadm/ui/Window.ui")]
-public class AikadmWindow : Gtk.Window  {
+[GtkTemplate (ui = "/com/github/humxc/aikadm/ui/window.ui")]
+public class Aikadm.Window : Gtk.Window  {
     public Option option;
-    public List<Utils.Session> sessions;
-    public List<Utils.User> users;
+    public List<Common.Session> sessions;
+    public List<Common.User> users;
     public AstalIO.Variable currentMonitor;
     public int monitor;
     public AstalIO.Variable isInput = new AstalIO.Variable (false);
@@ -11,7 +10,7 @@ public class AikadmWindow : Gtk.Window  {
     private unowned Gtk.Picture background;
     [GtkChild]
     private unowned Gtk.Revealer dateTimeRevealer;
-    public AikadmWindow (AstalIO.Variable currentMonitor, int monitor, Option option, List<Utils.Session> sessions, List<Utils.User> users) {
+    public Window (AstalIO.Variable currentMonitor, int monitor, Option option, List<Common.Session> sessions, List<Common.User> users) {
         Object (title: "aikadm", css_name: "window", name: "aikadm");
         this.option = option;
         this.sessions = sessions.copy_deep ((s) => s);
@@ -34,7 +33,7 @@ public class AikadmWindow : Gtk.Window  {
         var scale = 1;
         var width = (int) (rect.width * scale);
         var height = (int) (rect.height * scale);
-        var img = Utils.get_wallpaper (option.wallpaper, 0);
+        var img = Common.get_wallpaper (option.wallpaper, 0);
         if (img == "")return;
         var pixbuf = new Gdk.Pixbuf.from_file (img);
         background.set_paintable (Gdk.Texture.for_pixbuf (scale_and_center (pixbuf, width, height)));
@@ -47,7 +46,7 @@ public class AikadmWindow : Gtk.Window  {
         GtkLayerShell.set_keyboard_mode (this, GtkLayerShell.KeyboardMode.ON_DEMAND);
         GtkLayerShell.set_monitor (this, m);
         GtkLayerShell.set_layer (this, GtkLayerShell.Layer.TOP);
-        GtkLayerShell.set_layer (this, GtkLayerShell.Layer.BACKGROUND); // TESTING only
+        if (option.debug)GtkLayerShell.set_layer (this, GtkLayerShell.Layer.BACKGROUND);
         GtkLayerShell.set_exclusive_zone (this, 1);
         GtkLayerShell.set_anchor (this, GtkLayerShell.Edge.LEFT, true);
         GtkLayerShell.set_anchor (this, GtkLayerShell.Edge.TOP, true);

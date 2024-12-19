@@ -1,5 +1,6 @@
-public class Aikadm : Gtk.Application {
-    public Aikadm () {
+
+public class Aikadm.App : Gtk.Application {
+    public App () {
         Object (application_id: "com.github.humxc.aikadm");
     }
 
@@ -12,14 +13,14 @@ public class Aikadm : Gtk.Application {
                                                    Gdk.Display.get_default (),
                                                    provider,
                                                    Gtk.STYLE_PROVIDER_PRIORITY_USER);
-        var users = Utils.get_users ();
+        var users = Common.get_users ();
         foreach (var u in users)print ("User: %s\n", u.name);
-        var sessions = Utils.get_sessions ({ "/nix/store/p0aydfnn5bq4slmjl8v7pbskgxxwn4bi-desktops/share/wayland-sessions" });
+        var sessions = Common.get_sessions ({ "/nix/store/p0aydfnn5bq4slmjl8v7pbskgxxwn4bi-desktops/share/wayland-sessions" });
         foreach (var u in sessions)print ("Session: %s\n", u.name);
         var currentMonitor = new AstalIO.Variable (0);
         var monitors = Gdk.Display.get_default ().get_monitors ();
         for (var i = 0; i < monitors.get_n_items (); i++) {
-            var window = new AikadmWindow (currentMonitor, i, option, sessions, users);
+            var window = new Aikadm.Window (currentMonitor, i, option, sessions, users);
             this.add_window (window);
             ((Gtk.Widget) window).destroy.connect (() => {
                 this.quit ();
@@ -30,9 +31,10 @@ public class Aikadm : Gtk.Application {
     }
 
     public static int main (string[] args) {
+        ensure_types ();
         var option = Option (args);
         print ("Option:\n%s", option.to_string ());
-        var app = new Aikadm ();
+        var app = new Aikadm.App ();
         app.option = option;
         return app.run (args);
     }

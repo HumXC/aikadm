@@ -1,0 +1,19 @@
+using Gtk 4.0;
+template $AikadmWindow : Gtk.Window {
+    can-focus: true;
+    title: "Aikadm"; 
+    Overlay {
+        hexpand: true;
+        vexpand: true;
+        [overlay]
+        Picture background {  }
+        [overlay]
+        Revealer dateTimeRevealer {
+            transition-type: crossfade;
+            transition-duration: 500;
+            $AikadmDateTime datetime { 
+                margin-top: 220;
+            }
+        } 
+    }
+}

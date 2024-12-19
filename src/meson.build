@@ -1,10 +1,12 @@
 gnome = import('gnome')
 
 sources += [
-    'Aikadm.vala',
-    'Utils.vala',
-    'Option.vala',
-    'Window.vala',
+    'aikadm.vala',
+    'common.vala',
+    'option.vala',
+    'window.vala',
+    'date-time.vala',
+    'ensure-types.vala',
 ]
 
 deps = [
@@ -15,6 +17,7 @@ deps = [
     dependency('gdk-pixbuf-2.0'),
     meson.get_compiler('vala').find_library('posix'),
 ]
+add_project_arguments('-DGETTEXT_PACKAGE="' + meson.project_name() + '"', language: 'c')
 executable(
     'aikadm',
     sources,

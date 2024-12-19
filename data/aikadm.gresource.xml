@@ -2,6 +2,7 @@
 <gresources>
   <gresource prefix="/com/github/humxc/aikadm">
     <file>style.css</file>
-    <file preprocess="xml-stripblanks">ui/Window.ui</file>
+    <file preprocess="xml-stripblanks">ui/window.ui</file>
+    <file preprocess="xml-stripblanks">ui/date-time.ui</file>
   </gresource>
 </gresources>

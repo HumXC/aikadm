@@ -1,10 +1,11 @@
 time-label {
     color: rgb(255, 255, 255);
-    text-shadow: 1px 1px 8px #6f6f6f;
+    text-shadow: 1px 1px 8px #3e3e3e;
     font-size: 128px;
+    padding-top: 1px; // 不加此 padding-top 会导致动画变化时发生抖动
 }
 date-label {
     color: rgb(246, 246, 246);
     font: 22px bold;
-    text-shadow: 1px 1px 5px #6c6c6c;
+    text-shadow: 1px 1px 5px #414141;
 }

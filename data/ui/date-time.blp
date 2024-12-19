@@ -1,0 +1,13 @@
+using Gtk 4.0; 
+template $AikadmDateTime : Box{
+    halign: center;
+    valign: start;
+    orientation: vertical;
+    Label time { 
+        css-name: "time-label";
+    }
+    Label date { 
+        valign: start;
+        css-name: "date-label";
+    }   
+}

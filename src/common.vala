@@ -1,4 +1,4 @@
-namespace Utils {
+namespace Common {
     public class User {
         public string name;
         public string passwd;
