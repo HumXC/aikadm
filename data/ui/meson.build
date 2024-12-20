@@ -2,6 +2,7 @@ blueprints = custom_target(
     'blueprints',
     input: files(
         'date-time.blp',
+        'wallpaper.blp',
         'window.blp',
     ),
     output: '.',

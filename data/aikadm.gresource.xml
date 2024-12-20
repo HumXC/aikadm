@@ -4,5 +4,6 @@
     <file>style.css</file>
     <file preprocess="xml-stripblanks">ui/window.ui</file>
     <file preprocess="xml-stripblanks">ui/date-time.ui</file>
+    <file preprocess="xml-stripblanks">ui/wallpaper.ui</file>
   </gresource>
 </gresources>

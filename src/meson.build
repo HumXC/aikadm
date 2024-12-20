@@ -7,6 +7,7 @@ sources += [
     'window.vala',
     'date-time.vala',
     'ensure-types.vala',
+    'wallpaper.vala',
 ]
 
 deps = [

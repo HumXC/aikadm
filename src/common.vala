@@ -7,8 +7,8 @@ namespace Common {
         public string dir;
         public string shell;
     }
-    public List<User> get_users() {
-        var users = new List<User> ();
+    public User[] get_users() {
+        var users = new Array<User> ();
         for (var i = 1000; i <= 2000; i++) {
             unowned var u = Posix.getpwuid(i);
             if (u != null) {
@@ -20,10 +20,13 @@ namespace Common {
                     dir = u.pw_dir,
                     shell = u.pw_shell
                 };
-                users.append(copied);
+                users.append_val(copied);
             }
         }
-        return users;
+        var result = new User[users.length] {};
+        for (uint i = 0; i < users.length; i++)
+            result[i] = users.index(i);
+        return result;
     }
 
     public class Session {
@@ -31,8 +34,8 @@ namespace Common {
         public string exec;
         public string comment;
     }
-    public List<Session> get_sessions(string[] dirs) {
-        var sessions = new List<Session> ();
+    public Session[] get_sessions(string[] dirs) {
+        var sessions = new Array<Session> ();
         foreach (var dir in dirs) {
             var d = Dir.open(dir);
             var f = d.read_name();
@@ -46,11 +49,14 @@ namespace Common {
                 session.name = s.get_string(GLib.KeyFileDesktop.GROUP, GLib.KeyFileDesktop.KEY_NAME);
                 session.exec = s.get_string(GLib.KeyFileDesktop.GROUP, GLib.KeyFileDesktop.KEY_EXEC);
                 session.comment = s.get_string(GLib.KeyFileDesktop.GROUP, GLib.KeyFileDesktop.KEY_COMMENT);
-                sessions.append(session);
+                sessions.append_val(session);
                 f = d.read_name();
             }
         }
-        return sessions;
+        var result = new Session[sessions.length] {};
+        for (uint i = 0; i < sessions.length; i++)
+            result[i] = sessions.index(i);
+        return result;
     }
 
     public string get_wallpaper(string wallpaper, int monitor) {
