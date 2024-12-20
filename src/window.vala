@@ -4,13 +4,23 @@ public class Aikadm.Window : Gtk.Window  {
     public Common.Session[] sessions;
     public Common.User[] users;
     public AstalIO.Variable currentMonitor;
-    public AstalIO.Variable isInput = new AstalIO.Variable (false);
+    private AstalIO.Variable isInput = new AstalIO.Variable (false);
+    public bool isInputState { get; set; }
     [GtkChild]
     private unowned Aikadm.Wallpaper wallpaper;
     [GtkChild]
-    private unowned Gtk.Revealer dateTimeRevealer;
+    private unowned Aikadm.BlurCanvas bluredWallpaper;
+    [GtkChild]
+    private unowned Gtk.Box bluredBox;
     public Window (AstalIO.Variable currentMonitor, int monitor, Option option, Common.Session[] sessions, Common.User[] users) {
-        Object (title: "aikadm", css_name: "window", name: "aikadm");
+        Object (
+                title: "aikadm",
+                css_name: "window",
+                name: "aikadm"
+        );
+        isInput.changed.connect (() => {
+            isInputState = isInput.value.get_boolean ();
+        });
         this.option = option;
         this.sessions = sessions;
         this.users = users;
@@ -18,10 +28,12 @@ public class Aikadm.Window : Gtk.Window  {
         set_key_bind ();
         set_layer (monitor);
         wallpaper.set_wallpaper (this.display, monitor, option.wallpaper);
-        Idle.add_once (() => dateTimeRevealer.set_reveal_child (true));
-        isInput.changed.connect (() => {
-            dateTimeRevealer.set_reveal_child (!isInput.value.get_boolean ());
-        });
+        bluredWallpaper.draw
+            ((Gdk.Texture) this.wallpaper.get_paintable (),
+            0.3, 30, 0.8,
+            100, 100, 0, 0);
+        bluredBox.set_margin_start (100);
+        bluredBox.set_margin_top (100);
     }
 
     private void set_layer (int monitor) {

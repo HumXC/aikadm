@@ -14,6 +14,10 @@ public class Aikadm.Wallpaper : Gtk.Box {
     var pixbuf = new Gdk.Pixbuf.from_file (img);
     picture.set_paintable (Gdk.Texture.for_pixbuf (scale_and_center (pixbuf, width, height)));
   }
+
+  public Gdk.Paintable get_paintable () {
+    return this.picture.get_paintable ();
+  }
 }
 
 private Gdk.Pixbuf scale_and_center (Gdk.Pixbuf pixbuf, int target_width, int target_height) {

@@ -8,6 +8,7 @@ sources += [
     'date-time.vala',
     'ensure-types.vala',
     'wallpaper.vala',
+    'blur-canvas.vala',
 ]
 
 deps = [

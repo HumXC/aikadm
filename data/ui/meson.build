@@ -1,6 +1,7 @@
 blueprints = custom_target(
     'blueprints',
     input: files(
+        'blur-canvas.blp',
         'date-time.blp',
         'wallpaper.blp',
         'window.blp',

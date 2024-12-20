@@ -8,9 +8,21 @@ template $AikadmWindow : Gtk.Window {
         [overlay]
         $AikadmWallpaper wallpaper {  }
         [overlay]
-        Revealer dateTimeRevealer {
+        Revealer {
             transition-type: crossfade;
-            transition-duration: 500;
+            transition-duration: 200;
+            reveal-child: bind template.isInputState;
+            Box bluredBox {
+                halign: start;
+                valign: start;
+                $AikadmBlurCanvas bluredWallpaper {  }
+            }
+        }
+        [overlay]
+        Revealer {
+            transition-type: crossfade;
+            transition-duration: 200;
+            reveal-child:bind  template.isInputState inverted;
             $AikadmDateTime datetime { 
                 margin-top: 220;
             }
