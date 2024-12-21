@@ -3,7 +3,29 @@ public class Aikadm.BlurCanvas : Gtk.Box {
     [GtkChild]
     private unowned Gtk.Picture picture;
     private Gsk.Renderer renderer = new Gsk.NglRenderer();
-    public void draw(Gdk.Texture t, double scale_factor, int blur_radius, double brightness, int offset_x, int offset_y, int offset_w, int offset_h) {
+    private Gdk.Texture texture;
+    private Gdk.Texture blured;
+    public BlurCanvas() {
+    }
+
+    public void set_texture(Gdk.Texture t, double scale_factor, int blur_radius, double brightness) {
+        texture = t;
+        this.preprocess(t, scale_factor, blur_radius, brightness);
+    }
+
+    public void draw(float x, float y, float w, float h) {
+        float width = this.texture.get_width();
+        float height = this.texture.get_height();
+        w = w <= 0 ? width : w;
+        h = h <= 0 ? height : h;
+        Gsk.RenderNode node;
+        node = new Gsk.TextureScaleNode(blured, rect(0, 0, width, height), Gsk.ScalingFilter.LINEAR);
+        var result = renderer.render_texture(node, rect(x, y, w, h));
+        picture.set_paintable(result);
+        picture.queue_draw();
+    }
+
+    private void preprocess(Gdk.Texture t, double scale_factor, int blur_radius, double brightness) {
         var blurRadius = (float) (blur_radius * scale_factor);
         var scaledW = (float) (t.get_width() * scale_factor);
         var scaledH = (float) (t.get_height() * scale_factor);
@@ -14,21 +36,11 @@ public class Aikadm.BlurCanvas : Gtk.Box {
         node = new Gsk.BlendNode(bottom, top, Gsk.BlendMode.DEFAULT);
         node = new Gsk.BlurNode(node, blurRadius);
         node = darken(node, (float) brightness);
-        var blured = renderer.render_texture(node, rect(blurRadius, blurRadius, scaledW, scaledH));
-        int x = offset_x;
-        int y = offset_y;
-        int w = (offset_w <= 0 ? t.get_width() + offset_w : offset_w);
-        int h = (offset_h <= 0 ? t.get_height() + offset_h : offset_h);
-
-        node = new Gsk.TextureScaleNode(blured, rect(0, 0, t.get_width(), t.get_height()), Gsk.ScalingFilter.LINEAR);
-        var result = renderer.render_texture(node, rect(x, y, w, h));
-        picture.set_size_request(w, h);
-        picture.set_paintable(result);
+        this.blured = renderer.render_texture(node, rect(blurRadius, blurRadius, scaledW, scaledH));
     }
 
     private Gsk.TextureScaleNode scale(Gdk.Texture t, float w, float h) {
         var scaledRect = rect(0, 0, w, h);
-        print("SSSScaled %f %f", scaledRect.size.width, scaledRect.size.height);
         return new Gsk.TextureScaleNode(t, scaledRect, Gsk.ScalingFilter.LINEAR);
     }
 

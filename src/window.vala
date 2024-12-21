@@ -28,12 +28,13 @@ public class Aikadm.Window : Gtk.Window  {
         set_key_bind ();
         set_layer (monitor);
         wallpaper.set_wallpaper (this.display, monitor, option.wallpaper);
-        bluredWallpaper.draw
-            ((Gdk.Texture) this.wallpaper.get_paintable (),
-            0.3, 30, 0.8,
-            100, 100, 0, 0);
-        bluredBox.set_margin_start (100);
-        bluredBox.set_margin_top (100);
+
+        bluredWallpaper.set_texture
+        (
+         ((Gdk.Texture) this.wallpaper.get_paintable ()),
+         0.3, 30, 0.8
+        );
+        bluredWallpaper.draw (0, 0, 0, 0);
     }
 
     private void set_layer (int monitor) {
