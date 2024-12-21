@@ -13,13 +13,17 @@
         };
         astal = inputs.astal.packages.${system};
       in
-      {
+      rec {
         packages.aikadm = pkgs.callPackage ./nix/package.nix {
           astal-greet = astal.greet;
           astal-io = astal.io;
         };
         lib = {
-          aikadm-hyprland-script = (args: (import ./nix/aikadm-hyprland-script.nix { inherit pkgs; } // args));
+          aikadm-hyprland-script = (args: (import ./nix/aikadm-hyprland-script.nix
+            {
+              inherit pkgs;
+              aikadm = packages.aikadm;
+            } // args));
         };
         devShells.default = pkgs.mkShell {
           buildInputs = (with pkgs;

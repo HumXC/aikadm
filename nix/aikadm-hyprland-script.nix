@@ -1,5 +1,5 @@
 { pkgs
-, aikadm ? pkgs.aikadm
+, aikadm
 , hyprlandPackage ? pkgs.hyprland
 , hyprConf ? ""
 , defaultUser ? ""
