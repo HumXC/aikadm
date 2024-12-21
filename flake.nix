@@ -18,7 +18,10 @@
           astal-greet = astal.greet;
           astal-io = astal.io;
         };
-        devShells.default = pkgs.mkShell rec{
+        lib = {
+          aikadm-hyprland-script = (args: (import ./nix/aikadm-hyprland-script.nix { inherit pkgs; } // args));
+        };
+        devShells.default = pkgs.mkShell {
           buildInputs = (with pkgs;
             [
               # Build-Tools

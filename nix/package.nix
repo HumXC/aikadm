@@ -14,7 +14,6 @@
 , sass
   # Dependencies
 , gtk4
-, glib
 , gtk4-layer-shell
 , gdk-pixbuf
 , astal-greet
@@ -48,7 +47,7 @@ stdenv.mkDerivation {
     astal-io
   ];
   name = "aikadm";
-  src = ./.;
+  src = ./..;
   meta = with lib; {
     homepage = "https://github.com/HumXC/aikadm";
     description = "";
