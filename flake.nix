@@ -14,7 +14,7 @@
         astal = inputs.astal.packages.${system};
       in
       {
-        packages.aikadm = pkgs.callPackage ./package.nix {
+        packages.aikadm = pkgs.callPackage ./nix/package.nix {
           astal-greet = astal.greet;
           astal-io = astal.io;
         };
