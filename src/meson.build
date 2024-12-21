@@ -24,4 +24,5 @@ executable(
     sources,
     dependencies: deps,
     link_args: ['-lm'],
+    install: true,
 )

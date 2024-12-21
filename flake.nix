@@ -14,6 +14,10 @@
         astal = inputs.astal.packages.${system};
       in
       {
+        packages.aikadm = pkgs.callPackage ./package.nix {
+          astal-greet = astal.greet;
+          astal-io = astal.io;
+        };
         devShells.default = pkgs.mkShell rec{
           buildInputs = (with pkgs;
             [
@@ -31,11 +35,8 @@
               sass
               # Dependencies
               gtk4
-              glib
               gtk4-layer-shell
-              libgee
               gdk-pixbuf
-              wlroots
             ]) ++ (with astal;[
             greet
             io

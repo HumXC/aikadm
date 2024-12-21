@@ -9,6 +9,8 @@ project(
   ],
   default_options: ['buildtype=debug'],
 )
+gnome = import('gnome')
+
 sources = []
 subdir('data')
 subdir('src')
