@@ -1,7 +1,6 @@
 subdir('ui')
 subdir('scss')
 
-gnome = import('gnome')
 sources += gnome.compile_resources(
     meson.project_name(),
     'aikadm.gresource.xml',

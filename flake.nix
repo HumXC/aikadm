@@ -18,12 +18,17 @@
           astal-greet = astal.greet;
           astal-io = astal.io;
         };
+        packages.aikadm-hyprland = lib.aikadm-hyprland-script {
+          defaultSession = "Hyprland";
+          debug = true;
+        };
         lib = {
           aikadm-hyprland-script = (args: (import ./nix/aikadm-hyprland-script.nix
-            {
+            ({
               inherit pkgs;
               aikadm = packages.aikadm;
-            } // args));
+            } // args)
+          ));
         };
         devShells.default = pkgs.mkShell {
           buildInputs = (with pkgs;
