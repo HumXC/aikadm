@@ -1,5 +1,3 @@
-gnome = import('gnome')
-
 sources += [
     'aikadm.vala',
     'common.vala',

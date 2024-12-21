@@ -1,14 +1,50 @@
 time-label {
     color: rgb(255, 255, 255);
-    text-shadow: 1px 1px 8px #3e3e3e;
+    text-shadow: 0 0 3px #424242;
     font-size: 128px;
-    padding-top: 1px; // 不加此 padding-top 会导致动画变化时发生抖动
+    padding: 2px;
 }
 date-label {
     color: rgb(246, 246, 246);
     font: 22px bold;
-    text-shadow: 1px 1px 5px #414141;
+    padding: 5px;
+    text-shadow: 0 0 1px #343434;
 }
-blur-canvas {
-    background: red;
+input-page {
+    user-avatar {
+        background: #414141;
+        border-radius: 100%;
+    }
+    password-input {
+        background-color: #0000001e;
+        transition: background-color 0.3s ease-in-out;
+        transition: border 0.3s ease-in-out;
+        border-radius: 20px;
+        border: 2px solid #ffffff43;
+        padding: 6px 8px;
+        selection {
+            background: #ffffff3e;
+            border-radius: 20px;
+        }
+    }
+    password-input:focus-within {
+        background-color: #00000052;
+        border: 2px solid #cacaca;
+        transition: background-color 0.3s ease-in-out;
+        transition: border 0.3s ease-in-out;
+    }
+    message {
+        color: #ffffffd2;
+        font-size: 14px;
+    }
+    username {
+        font-size: 32px;
+    }
+    session {
+        font-size: 20px;
+    }
+    session-comment {
+        font-size: 14px;
+        color: #ffffffb9;
+    }
 }

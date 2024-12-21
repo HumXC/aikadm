@@ -1,17 +1,14 @@
 [GtkTemplate (ui = "/com/github/humxc/aikadm/ui/window.ui")]
 public class Aikadm.Window : Gtk.Window  {
     public Option option;
-    public Common.Session[] sessions;
-    public Common.User[] users;
     public AstalIO.Variable currentMonitor;
     private AstalIO.Variable isInput = new AstalIO.Variable (false);
     public bool isInputState { get; set; }
+    public int animationDuration  { get; set; default = 500; }
     [GtkChild]
     private unowned Aikadm.Wallpaper wallpaper;
     [GtkChild]
     private unowned Aikadm.BlurCanvas bluredWallpaper;
-    [GtkChild]
-    private unowned Gtk.Box bluredBox;
     [GtkChild]
     private unowned Aikadm.InputPage inputPage;
     public Window (AstalIO.Variable currentMonitor, int monitor, Option option, Common.Session[] sessions, Common.User[] users) {
@@ -20,12 +17,11 @@ public class Aikadm.Window : Gtk.Window  {
                 css_name: "window",
                 name: "aikadm"
         );
+
         isInput.changed.connect (() => {
             isInputState = isInput.value.get_boolean ();
         });
         this.option = option;
-        this.sessions = sessions;
-        this.users = users;
         this.currentMonitor = currentMonitor;
         set_key_bind ();
         set_layer (monitor);
@@ -38,7 +34,28 @@ public class Aikadm.Window : Gtk.Window  {
         );
         bluredWallpaper.draw (0, 0, 0, 0);
 
-        inputPage.setup (users, option.defaultUser);
+        inputPage.setup (monitor, users, sessions, option.defaultUser, option.defaultSession);
+        inputPage.login_request.connect ((user, password, session, message) => {
+            if (option.debug) {
+                if (password == "debug") {
+                    this.close ();
+                    return;
+                }
+                message ("Debug mode, no login. Password: debug");
+                return;
+            }
+            AstalGreet.login_with_env.begin (user.name, password, session.exec, option.env, (_, res) => {
+                try {
+                    AstalGreet.login_with_env.end (res);
+                } catch (Error e) {
+                    message (e.message);
+                }
+            });
+        });
+        notify.connect ((spec) => {
+            if (spec.name != "isInputState" || !isInputState)return;
+            inputPage.focus_password ();
+        });
     }
 
     private void set_layer (int monitor) {
@@ -61,7 +78,7 @@ public class Aikadm.Window : Gtk.Window  {
         action_group.add_action_entries ({
             { "escape", () => {
                   if (this.option.debug && !this.isInput.value.get_boolean ()) {
-                      this.destroy ();
+                      this.close ();
                       return;
                   }
                   this.isInput.value = false;

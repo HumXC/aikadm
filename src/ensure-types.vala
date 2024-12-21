@@ -4,4 +4,6 @@ void ensure_types() {
     typeof (Aikadm.Wallpaper).ensure();
     typeof (Aikadm.BlurCanvas).ensure();
     typeof (Aikadm.InputPage).ensure();
+    typeof (Common.User).ensure();
+    typeof (Common.Session).ensure();
 }

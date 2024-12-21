@@ -1,5 +1,5 @@
 blueprints = custom_target(
-    'blueprints',
+    'compile-blueprints',
     input: files(
         'blur-canvas.blp',
         'date-time.blp',

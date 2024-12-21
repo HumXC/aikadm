@@ -1,18 +1,71 @@
 using Gtk 4.0;
-template $AikadmInputPage : Box {
+template $AikadmInputPage : Box { 
     orientation: vertical;
-    valign: center;
+    vexpand: true;
+    valign: fill;
     halign: center;
-    css-name: "input-page";
-    Picture avatar {
-        css-name: "user-avatar";
+    spacing: 10;
+    Box { 
+        vexpand: true; 
+        width-request: 400;
     }
+    Box {
+        Box {
+            hexpand: true;
+        }
+        Picture avatar {
+            width-request: 250;
+            height-request: 250;
+            css-name: "user-avatar";
+        }
+        Box {
+            hexpand: true;
+        }
+    }
+    
     Label username {
         css-name: "username";
+        label: bind template.username;
     }
-    Entry password {
-        visibility: false;
-        hexpand: true;
-        css-name: "password-input";
+    Box {
+        halign: fill;
+        Box {
+            hexpand: true;
+        }
+        Entry password {
+            can-focus: true;
+            visibility: false;
+            css-name: "password-input";
+            max-width-chars: 20;
+        }
+        Box {
+            hexpand: true;
+        }
     }
+    Overlay {
+        [overlay]
+        Label {
+            valign: start;
+            halign: center;
+            css-name: "message";
+            label: bind template.message;
+        }
+    }
+    Box { vexpand: true; }
+    Label {
+        css-name: "session";
+        label: bind template.session_name;
+    }
+    Overlay {
+        [overlay]
+        Label {
+            valign: start;
+            halign: center;
+            css-name: "session-comment";
+            label: bind template.session_comment;
+            wrap: true;
+            max-width-chars: 500;
+        }
+    } 
+    Box { height-request: 50; }
 }
