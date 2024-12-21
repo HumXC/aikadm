@@ -22,10 +22,18 @@ template $AikadmWindow : Gtk.Window {
         Revealer {
             transition-type: crossfade;
             transition-duration: 200;
-            reveal-child:bind  template.isInputState inverted;
+            reveal-child: bind template.isInputState inverted;
             $AikadmDateTime datetime { 
                 margin-top: 220;
             }
-        } 
+        }
+        [overlay]
+        Revealer {
+            transition-type: crossfade;
+            transition-duration: 200;
+            reveal-child: bind template.isInputState;
+            $AikadmInputPage inputPage { 
+            }
+        }
     }
 }

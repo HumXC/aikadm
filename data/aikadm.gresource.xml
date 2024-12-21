@@ -6,5 +6,6 @@
     <file preprocess="xml-stripblanks">ui/date-time.ui</file>
     <file preprocess="xml-stripblanks">ui/wallpaper.ui</file>
     <file preprocess="xml-stripblanks">ui/blur-canvas.ui</file>
+    <file preprocess="xml-stripblanks">ui/input-page.ui</file>
   </gresource>
 </gresources>

@@ -12,6 +12,8 @@ public class Aikadm.Window : Gtk.Window  {
     private unowned Aikadm.BlurCanvas bluredWallpaper;
     [GtkChild]
     private unowned Gtk.Box bluredBox;
+    [GtkChild]
+    private unowned Aikadm.InputPage inputPage;
     public Window (AstalIO.Variable currentMonitor, int monitor, Option option, Common.Session[] sessions, Common.User[] users) {
         Object (
                 title: "aikadm",
@@ -35,6 +37,8 @@ public class Aikadm.Window : Gtk.Window  {
          0.3, 30, 0.8
         );
         bluredWallpaper.draw (0, 0, 0, 0);
+
+        inputPage.setup (users, option.defaultUser);
     }
 
     private void set_layer (int monitor) {

@@ -110,4 +110,13 @@ namespace Common {
         var index = Random.int_range(0, (int32) images.length - 1);
         return images.index(index);
     }
+
+    public string get_user_avatar(string user) {
+        var path = "/var/lib/AccountsService/icons/" + user;
+        var file = File.new_for_path(path);
+        if (file.query_exists(null)) {
+            return path;
+        }
+        return "";
+    }
 }

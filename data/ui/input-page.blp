@@ -1,0 +1,18 @@
+using Gtk 4.0;
+template $AikadmInputPage : Box {
+    orientation: vertical;
+    valign: center;
+    halign: center;
+    css-name: "input-page";
+    Picture avatar {
+        css-name: "user-avatar";
+    }
+    Label username {
+        css-name: "username";
+    }
+    Entry password {
+        visibility: false;
+        hexpand: true;
+        css-name: "password-input";
+    }
+}

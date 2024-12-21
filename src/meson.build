@@ -9,6 +9,7 @@ sources += [
     'ensure-types.vala',
     'wallpaper.vala',
     'blur-canvas.vala',
+    'input-page.vala',
 ]
 
 deps = [

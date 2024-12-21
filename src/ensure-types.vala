@@ -3,4 +3,5 @@ void ensure_types() {
     typeof (Aikadm.DateTime).ensure();
     typeof (Aikadm.Wallpaper).ensure();
     typeof (Aikadm.BlurCanvas).ensure();
+    typeof (Aikadm.InputPage).ensure();
 }
