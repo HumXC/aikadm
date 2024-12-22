@@ -2,8 +2,7 @@
 public class Aikadm.Window : Gtk.Window  {
     public Option option;
     public AstalIO.Variable currentMonitor;
-    private AstalIO.Variable isInput = new AstalIO.Variable (false);
-    public bool isInputState { get; set; }
+    public bool isInput { get; set; }
     public int animationDuration  { get; set; default = 500; }
     [GtkChild]
     private unowned Aikadm.Wallpaper wallpaper;
@@ -19,10 +18,6 @@ public class Aikadm.Window : Gtk.Window  {
                 css_name: "window",
                 name: "aikadm"
         );
-
-        isInput.changed.connect (() => {
-            isInputState = isInput.value.get_boolean ();
-        });
         this.option = option;
         this.currentMonitor = currentMonitor;
         set_key_bind ();
@@ -58,7 +53,7 @@ public class Aikadm.Window : Gtk.Window  {
             });
         });
         notify.connect ((spec) => {
-            if (spec.name != "isInputState" || !isInputState)return;
+            if (spec.name != "isInputState" || !isInput)return;
             inputPage.focus_password ();
         });
 
@@ -93,15 +88,15 @@ public class Aikadm.Window : Gtk.Window  {
         var action_group = new SimpleActionGroup ();
         action_group.add_action_entries ({
             { "escape", () => {
-                  if (this.option.debug && !this.isInput.value.get_boolean ()) {
+                  if (this.option.debug && !this.isInput) {
                       this.need_close ();
                       return;
                   }
-                  this.isInput.value = false;
+                  this.isInput = false;
               } },
             { "enter", () => {
-                  if (!this.isInput.value.get_boolean ()) {
-                      this.isInput.value = true;
+                  if (!this.isInput) {
+                      this.isInput = true;
                   }
               } },
         }, this);

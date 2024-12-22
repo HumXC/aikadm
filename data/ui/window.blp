@@ -11,7 +11,7 @@ template $AikadmWindow : Gtk.Window {
         Revealer {
             transition-type: crossfade;
             transition-duration: bind template.animationDuration;
-            reveal-child: bind template.isInputState;
+            reveal-child: bind template.isInput;
             Box bluredBox {
                 halign: start;
                 valign: start;
@@ -22,7 +22,7 @@ template $AikadmWindow : Gtk.Window {
         Revealer {
             transition-type: crossfade;
             transition-duration: bind template.animationDuration;
-            reveal-child: bind template.isInputState inverted;
+            reveal-child: bind template.isInput inverted;
             $AikadmDateTime datetime { 
                 margin-top: 220;
             }
@@ -31,7 +31,7 @@ template $AikadmWindow : Gtk.Window {
         Revealer {
             transition-type: crossfade;
             transition-duration: bind template.animationDuration;
-            reveal-child: bind template.isInputState;
+            reveal-child: bind template.isInput;
             hexpand: true;
             vexpand: true;
             halign: center;
