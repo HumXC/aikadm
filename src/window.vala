@@ -38,6 +38,8 @@ public class Aikadm.Window : Gtk.Window  {
 
         inputPage.setup (monitor, users, sessions, option.defaultUser, option.defaultSession);
         inputPage.login_request.connect ((user, password, session, message) => {
+            var cmd = @"$(user.shell) -c \"$(session.exec)\"";
+            print (cmd);
             if (option.debug) {
                 if (password == "debug") {
                     need_close ();
@@ -46,7 +48,7 @@ public class Aikadm.Window : Gtk.Window  {
                 message ("Debug mode, no login. Password: debug");
                 return;
             }
-            AstalGreet.login_with_env.begin (user.name, password, @"@user.shell -c @session.exec", option.env, (_, res) => {
+            AstalGreet.login_with_env.begin (user.name, password, cmd, option.env, (_, res) => {
                 try {
                     AstalGreet.login_with_env.end (res);
                     need_close ();
