@@ -3,10 +3,11 @@ public class Aikadm.InputPage : Gtk.Box {
     [GtkChild]
     private unowned Gtk.Picture avatar;
     [GtkChild]
-    private unowned Gtk.Entry password;
+    private unowned Gtk.PasswordEntry password;
     private Common.User[] users;
     private Common.Session[] sessions;
     int monitor;
+    public bool is_busy { get; set; }
     public string username  { get; set; }
     public string message { get; set; }
     public string session_name { get; set; }
@@ -28,8 +29,10 @@ public class Aikadm.InputPage : Gtk.Box {
             }
         });
         password.activate.connect (() => {
-            this.message = "";
+            if (is_busy)return;
             if (password.get_text () == "")return;
+            is_busy = true;
+            this.message = "";
             Common.User user;
             Common.Session session;
             foreach (var u in users) {
@@ -42,6 +45,8 @@ public class Aikadm.InputPage : Gtk.Box {
             if (message != "") {
                 password.select_region (0, -1);
             }
+            is_busy = message == "";
+            if (!is_busy)password.grab_focus ();
         });
     }
 

@@ -19,12 +19,16 @@ public class Aikadm.App : Gtk.Application {
         foreach (var u in sessions)print ("Session: %s\n", u.name);
         var currentMonitor = new AstalIO.Variable (0);
         var monitors = Gdk.Display.get_default ().get_monitors ();
+        bool is_quit = false;
         for (var i = 0; i < monitors.get_n_items (); i++) {
             var window = new Aikadm.Window (currentMonitor, i, option, sessions, users);
-            this.add_window (window);
-            ((Gtk.Widget) window).destroy.connect (() => {
+            window.close_request.connect (() => {
+                if (is_quit)return false;
+                is_quit = true;
                 this.quit ();
+                return false;
             });
+            window.need_close.connect (() => window.close ());
             window.present ();
         }
         this.hold ();
@@ -34,6 +38,8 @@ public class Aikadm.App : Gtk.Application {
         ensure_types ();
         var option = Option (args);
         print ("Option:\n%s", option.to_string ());
+        if (GLib.Environment.get_variable ("GREETD_SOCK") == null)
+            option.debug = true;
         var app = new Aikadm.App ();
         app.option = option;
         return app.run (args);

@@ -1,6 +1,10 @@
 using Gtk 4.0;
 template $AikadmWallpaper : Box {
+    halign: center;
+    valign: center;
     Picture picture {
+        hexpand: true;
+        vexpand: true;
         css-name: "wallpaper";
     }
 }

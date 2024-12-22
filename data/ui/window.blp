@@ -42,5 +42,16 @@ template $AikadmWindow : Gtk.Window {
             }
             
         }
+        [overlay]
+        Revealer mask {
+            transition-type: crossfade;
+            reveal-child: true;
+            can-target: false;
+            Box {
+                hexpand: true;
+                vexpand: true;
+                css-name: "mask";
+            }
+        }
     }
 }

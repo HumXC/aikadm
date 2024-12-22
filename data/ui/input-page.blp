@@ -32,9 +32,9 @@ template $AikadmInputPage : Box {
         Box {
             hexpand: true;
         }
-        Entry password {
+        PasswordEntry password {
+            sensitive: bind template.is_busy inverted;
             can-focus: true;
-            visibility: false;
             css-name: "password-input";
             max-width-chars: 20;
         }

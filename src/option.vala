@@ -88,15 +88,6 @@ public struct  Option {
                 "Environment variables to set for the session",
                 "KEY=VALUE..."
             },
-            {
-                "debug",
-                '\0',
-                GLib.OptionFlags.NONE,
-                GLib.OptionArg.NONE,
-                ref debug,
-                "Enable debug mode",
-                null
-            },
             { null },
         }, "-");
         ctx.parse (ref args);

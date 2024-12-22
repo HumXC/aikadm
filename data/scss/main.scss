@@ -1,14 +1,17 @@
+* {
+    color: white;
+}
 time-label {
     color: rgb(255, 255, 255);
-    text-shadow: 0 0 3px #424242;
+    text-shadow: 0 0 8px #42424223;
     font-size: 128px;
     padding: 2px;
 }
 date-label {
-    color: rgb(246, 246, 246);
+    color: rgb(255, 255, 255);
     font: 22px bold;
     padding: 5px;
-    text-shadow: 0 0 1px #343434;
+    text-shadow: 0 0 5px #34343435;
 }
 input-page {
     user-avatar {
@@ -21,7 +24,7 @@ input-page {
         transition: border 0.3s ease-in-out;
         border-radius: 20px;
         border: 2px solid #ffffff43;
-        padding: 6px 8px;
+        padding: 6px 12px;
         selection {
             background: #ffffff3e;
             border-radius: 20px;
@@ -47,4 +50,7 @@ input-page {
         font-size: 14px;
         color: #ffffffb9;
     }
+}
+mask {
+    background-color: black;
 }

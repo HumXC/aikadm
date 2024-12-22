@@ -11,6 +11,8 @@ public class Aikadm.Window : Gtk.Window  {
     private unowned Aikadm.BlurCanvas bluredWallpaper;
     [GtkChild]
     private unowned Aikadm.InputPage inputPage;
+    [GtkChild]
+    private unowned Gtk.Revealer mask;
     public Window (AstalIO.Variable currentMonitor, int monitor, Option option, Common.Session[] sessions, Common.User[] users) {
         Object (
                 title: "aikadm",
@@ -38,15 +40,16 @@ public class Aikadm.Window : Gtk.Window  {
         inputPage.login_request.connect ((user, password, session, message) => {
             if (option.debug) {
                 if (password == "debug") {
-                    this.close ();
+                    need_close ();
                     return;
                 }
                 message ("Debug mode, no login. Password: debug");
                 return;
             }
-            AstalGreet.login_with_env.begin (user.name, password, session.exec, option.env, (_, res) => {
+            AstalGreet.login_with_env.begin (user.name, password, @"@user.shell -c @session.exec", option.env, (_, res) => {
                 try {
                     AstalGreet.login_with_env.end (res);
+                    need_close ();
                 } catch (Error e) {
                     message (e.message);
                 }
@@ -56,7 +59,18 @@ public class Aikadm.Window : Gtk.Window  {
             if (spec.name != "isInputState" || !isInputState)return;
             inputPage.focus_password ();
         });
+
+        mask.transition_duration = animationDuration * 2;
+        Idle.add_once (() => mask.reveal_child = false);
+        this.close_request.connect (() => {
+            if (mask.reveal_child)return false;
+            mask.reveal_child = true;
+            Timeout.add_once (mask.transition_duration, () => this.close ());
+            return true;
+        });
     }
+
+    public signal void need_close ();
 
     private void set_layer (int monitor) {
         ListModel monitors = display.get_monitors ();
@@ -65,8 +79,7 @@ public class Aikadm.Window : Gtk.Window  {
         GtkLayerShell.set_keyboard_mode (this, GtkLayerShell.KeyboardMode.ON_DEMAND);
         GtkLayerShell.set_monitor (this, m);
         GtkLayerShell.set_layer (this, GtkLayerShell.Layer.TOP);
-        if (option.debug)GtkLayerShell.set_layer (this, GtkLayerShell.Layer.BACKGROUND);
-        GtkLayerShell.set_exclusive_zone (this, 1);
+        GtkLayerShell.set_exclusive_zone (this, -1);
         GtkLayerShell.set_anchor (this, GtkLayerShell.Edge.LEFT, true);
         GtkLayerShell.set_anchor (this, GtkLayerShell.Edge.TOP, true);
         GtkLayerShell.set_anchor (this, GtkLayerShell.Edge.RIGHT, true);
@@ -78,7 +91,7 @@ public class Aikadm.Window : Gtk.Window  {
         action_group.add_action_entries ({
             { "escape", () => {
                   if (this.option.debug && !this.isInput.value.get_boolean ()) {
-                      this.close ();
+                      this.need_close ();
                       return;
                   }
                   this.isInput.value = false;
