@@ -53,7 +53,7 @@ public class Aikadm.Window : Gtk.Window  {
             });
         });
         notify.connect ((spec) => {
-            if (spec.name != "isInputState" || !isInput)return;
+            if (spec.name != "isInput" || !isInput)return;
             inputPage.focus_password ();
         });
 
