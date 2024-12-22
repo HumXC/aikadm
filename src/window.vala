@@ -63,7 +63,7 @@ public class Aikadm.Window : Gtk.Window  {
         });
 
         mask.transition_duration = animationDuration * 2;
-        Idle.add_once (() => mask.reveal_child = false);
+        Timeout.add_once (200, () => mask.reveal_child = false);
         this.close_request.connect (() => {
             if (mask.reveal_child)return false;
             mask.reveal_child = true;
@@ -81,6 +81,7 @@ public class Aikadm.Window : Gtk.Window  {
         GtkLayerShell.set_keyboard_mode (this, GtkLayerShell.KeyboardMode.ON_DEMAND);
         GtkLayerShell.set_monitor (this, m);
         GtkLayerShell.set_layer (this, GtkLayerShell.Layer.TOP);
+        if (option.debug)GtkLayerShell.set_layer (this, GtkLayerShell.Layer.BACKGROUND);
         GtkLayerShell.set_exclusive_zone (this, -1);
         GtkLayerShell.set_anchor (this, GtkLayerShell.Edge.LEFT, true);
         GtkLayerShell.set_anchor (this, GtkLayerShell.Edge.TOP, true);

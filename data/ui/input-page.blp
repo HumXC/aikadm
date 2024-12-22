@@ -32,11 +32,19 @@ template $AikadmInputPage : Box {
         Box {
             hexpand: true;
         }
-        PasswordEntry password {
-            sensitive: bind template.is_busy inverted;
-            can-focus: true;
-            css-name: "password-input";
-            max-width-chars: 20;
+        Overlay {
+            PasswordEntry password {
+                sensitive: bind template.is_busy inverted;
+                can-focus: true;
+                css-name: "password-input";
+                max-width-chars: 20;
+            }
+            [overlay]
+            Label {
+                halign: end;
+                margin-end : 10;
+                label: ">";
+            }
         }
         Box {
             hexpand: true;
