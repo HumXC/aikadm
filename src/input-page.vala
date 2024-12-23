@@ -29,8 +29,7 @@ public class Aikadm.InputPage : Gtk.Box {
             }
         });
         password.activate.connect (() => {
-            if (is_busy)return;
-            if (password.get_text () == "")return;
+            if (is_busy || password.get_text () == "")return;
             is_busy = true;
             this.message = "";
             Common.User user;

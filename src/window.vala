@@ -92,12 +92,11 @@ public class Aikadm.Window : Gtk.Window  {
                       this.need_close ();
                       return;
                   }
+                  this.set_focus (null);
                   this.isInput = false;
               } },
             { "enter", () => {
-                  if (!this.isInput) {
-                      this.isInput = true;
-                  }
+                  if (!this.isInput)this.isInput = true;
               } },
         }, this);
 
