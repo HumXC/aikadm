@@ -22,8 +22,7 @@ template $AikadmInputPage : Box {
             hexpand: true;
         }
     }
-    
-    Label username {
+    Label username_label {
         css-name: "username";
         label: bind template.username;
     }
@@ -40,10 +39,10 @@ template $AikadmInputPage : Box {
                 max-width-chars: 20;
             }
             [overlay]
-            Label {
+            Image {
+                icon-name: "builder-move-right-symbolic";
                 halign: end;
                 margin-end : 10;
-                label: ">";
             }
         }
         Box {
@@ -60,7 +59,7 @@ template $AikadmInputPage : Box {
         }
     }
     Box { vexpand: true; }
-    Label {
+    Label session_name_label {
         css-name: "session";
         label: bind template.session_name;
     }

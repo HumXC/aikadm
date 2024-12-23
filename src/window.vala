@@ -9,7 +9,7 @@ public class Aikadm.Window : Gtk.Window  {
     [GtkChild]
     private unowned Aikadm.BlurCanvas bluredWallpaper;
     [GtkChild]
-    private unowned Aikadm.InputPage inputPage;
+    public unowned Aikadm.InputPage inputPage;
     [GtkChild]
     private unowned Gtk.Revealer mask;
     public Window (AstalIO.Variable currentMonitor, int monitor, Option option, Common.Session[] sessions, Common.User[] users) {
@@ -31,7 +31,7 @@ public class Aikadm.Window : Gtk.Window  {
         );
         bluredWallpaper.draw (0, 0, 0, 0);
 
-        inputPage.setup (monitor, users, sessions, option.defaultUser, option.defaultSession);
+        inputPage.setup (monitor, users, sessions, "", "");
         inputPage.login_request.connect ((user, password, session, message) => {
             var cmd = @"$(user.shell) -c \"$(session.exec)\"";
             print (cmd);

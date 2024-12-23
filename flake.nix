@@ -49,6 +49,7 @@
               gtk4
               gtk4-layer-shell
               gdk-pixbuf
+              librsvg
             ]) ++ (with astal;[
             greet
             io

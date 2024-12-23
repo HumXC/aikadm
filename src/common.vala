@@ -111,12 +111,42 @@ namespace Common {
         return images.index(index);
     }
 
-    public string get_user_avatar(string user) {
+    public string ? get_user_avatar(string user) {
         var path = "/var/lib/AccountsService/icons/" + user;
         var file = File.new_for_path(path);
         if (file.query_exists(null)) {
             return path;
         }
-        return "";
+        return null;
+    }
+
+    public class TempData {
+        public uint8 user = 0;
+        public uint8 session = 0;
+        public uint8 monitor = 0;
+        public void load() {
+            var f = GLib.File.new_for_path("/tmp/aikadm");
+            if (!f.query_exists(null))return;
+            var temp = f.read(null);
+            uint8[] buffer = new uint8[3];
+            size_t bytes_read;
+            temp.read_all(buffer, out bytes_read, null);
+            user = buffer[0];
+            session = buffer[1];
+            monitor = buffer[2];
+            temp.close(null);
+        }
+
+        public void save() {
+            var f = GLib.File.new_for_path("/tmp/aikadm");
+            if (f.query_exists(null))f.delete(null);
+            var temp = f.create(GLib.FileCreateFlags.NONE, null);
+            uint8[] buffer = new uint8[3];
+            buffer[0] = user;
+            buffer[1] = session;
+            buffer[2] = monitor;
+            temp.write(buffer, null);
+            temp.close(null);
+        }
     }
 }

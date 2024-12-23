@@ -1,7 +1,4 @@
 public struct  Option {
-    string defaultUser;
-    string defaultSession;
-    int defaultMonitor;
     string wallpaper;
     bool debug;
     [CCode (array_length = false, array_null_terminated = true)]
@@ -11,9 +8,6 @@ public struct  Option {
     public string to_string () {
         var str = "";
         str += "[debug: " + debug.to_string () + "]\n";
-        str += "[defaultUser: " + defaultUser + "]\n";
-        str += "[defaultSession: " + defaultSession + "]\n";
-        str += "[defaultMonitor: " + defaultMonitor.to_string () + "]\n";
         str += "[wallpaper: " + wallpaper + "]\n";
         str += "[sessionDirs: ";
         for (var i = 0; i < sessionDirs.length; i++) {
@@ -30,8 +24,6 @@ public struct  Option {
 
     public Option (string[] args) {
         wallpaper = "";
-        defaultUser = "";
-        defaultSession = "";
         var ctx = new GLib.OptionContext ();
         ctx.add_main_entries ({
             {
@@ -42,33 +34,6 @@ public struct  Option {
                 ref wallpaper,
                 "A file path or a directory path to set as wallpaper",
                 "DIR|FILE"
-            },
-            {
-                "default-user",
-                'u',
-                GLib.OptionFlags.NONE,
-                GLib.OptionArg.STRING,
-                ref defaultUser,
-                "Default selected user",
-                "USER"
-            },
-            {
-                "default-session",
-                's',
-                GLib.OptionFlags.NONE,
-                GLib.OptionArg.STRING,
-                ref defaultSession,
-                "Default selected session",
-                "SESSION"
-            },
-            {
-                "default-monitor",
-                'm',
-                GLib.OptionFlags.NONE,
-                GLib.OptionArg.INT,
-                ref defaultMonitor,
-                "Default display monitor",
-                "INTEGER"
             },
             {
                 "session-dirs",

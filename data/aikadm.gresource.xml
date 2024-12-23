@@ -7,5 +7,9 @@
     <file preprocess="xml-stripblanks">ui/wallpaper.ui</file>
     <file preprocess="xml-stripblanks">ui/blur-canvas.ui</file>
     <file preprocess="xml-stripblanks">ui/input-page.ui</file>
+
+    <file compressed="true">icons/scalable/apps/people.svg</file>
+    <file compressed="true">icons/scalable/apps/builder-move-right-symbolic.svg</file>
+    <file compressed="true">icons/scalable/apps/builder-move-left-symbolic.svg</file>
   </gresource>
 </gresources>
