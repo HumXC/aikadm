@@ -16,7 +16,6 @@
       rec {
         packages.aikadm = pkgs.callPackage ./nix/package.nix {
           astal-greet = astal.greet;
-          astal-io = astal.io;
         };
         packages.aikadm-hyprland = lib.aikadm-hyprland-script {
           defaultSession = "Hyprland";

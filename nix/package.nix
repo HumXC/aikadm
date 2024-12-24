@@ -17,7 +17,7 @@
 , gtk4-layer-shell
 , gdk-pixbuf
 , astal-greet
-, astal-io
+, librsvg
 }:
 
 let
@@ -44,7 +44,7 @@ stdenv.mkDerivation {
     gtk4-layer-shell
     gdk-pixbuf
     astal-greet
-    astal-io
+    librsvg
   ];
   name = "aikadm";
   src = ./..;
