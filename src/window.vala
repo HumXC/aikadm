@@ -1,9 +1,8 @@
 [GtkTemplate (ui = "/com/github/humxc/aikadm/ui/window.ui")]
 public class Aikadm.Window : Gtk.Window  {
-    public Option option;
-    public AstalIO.Variable currentMonitor;
     public bool isInput { get; set; }
     public int animationDuration  { get; set; default = 500; }
+    public int monitor { get; set; }
     [GtkChild]
     private unowned Aikadm.Wallpaper wallpaper;
     [GtkChild]
@@ -12,14 +11,15 @@ public class Aikadm.Window : Gtk.Window  {
     public unowned Aikadm.InputPage inputPage;
     [GtkChild]
     private unowned Gtk.Revealer mask;
-    public Window (AstalIO.Variable currentMonitor, int monitor, Option option, Common.Session[] sessions, Common.User[] users) {
+    public bool isDebug { get; set; }
+    public Window (int monitor, Option option, Common.Session[] sessions, Common.User[] users, int defaultUser, int defaultSession) {
         Object (
                 title: "aikadm",
                 css_name: "window",
                 name: "aikadm"
         );
-        this.option = option;
-        this.currentMonitor = currentMonitor;
+        this.monitor = monitor;
+        this.isDebug = option.debug;
         set_key_bind ();
         set_layer (monitor);
         wallpaper.set_wallpaper (this.display, monitor, option.wallpaper);
@@ -31,7 +31,7 @@ public class Aikadm.Window : Gtk.Window  {
         );
         bluredWallpaper.draw (0, 0, 0, 0);
 
-        inputPage.setup (monitor, users, sessions, "", "");
+        inputPage.setup (monitor, users, sessions, defaultUser, defaultSession);
         inputPage.login_request.connect ((user, password, session, message) => {
             var cmd = @"$(user.shell) -c \"$(session.exec)\"";
             print (cmd);
@@ -76,7 +76,7 @@ public class Aikadm.Window : Gtk.Window  {
         GtkLayerShell.set_keyboard_mode (this, GtkLayerShell.KeyboardMode.ON_DEMAND);
         GtkLayerShell.set_monitor (this, m);
         GtkLayerShell.set_layer (this, GtkLayerShell.Layer.TOP);
-        if (option.debug)GtkLayerShell.set_layer (this, GtkLayerShell.Layer.BACKGROUND);
+        if (isDebug)GtkLayerShell.set_layer (this, GtkLayerShell.Layer.BACKGROUND);
         GtkLayerShell.set_exclusive_zone (this, -1);
         GtkLayerShell.set_anchor (this, GtkLayerShell.Edge.LEFT, true);
         GtkLayerShell.set_anchor (this, GtkLayerShell.Edge.TOP, true);
@@ -88,7 +88,7 @@ public class Aikadm.Window : Gtk.Window  {
         var action_group = new SimpleActionGroup ();
         action_group.add_action_entries ({
             { "escape", () => {
-                  if (this.option.debug && !this.isInput) {
+                  if (isDebug && !this.isInput) {
                       this.need_close ();
                       return;
                   }

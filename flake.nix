@@ -52,7 +52,6 @@
               librsvg
             ]) ++ (with astal;[
             greet
-            io
           ]);
           shellHook = ''
             echo "${pkgs.lldb}/bin/lldb-dap"

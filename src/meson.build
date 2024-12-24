@@ -14,7 +14,6 @@ deps = [
     dependency('gtk4-layer-shell-0'),
     dependency('gtk4'),
     dependency('astal-greet-0.1'),
-    dependency('astal-io-0.1'),
     dependency('gdk-pixbuf-2.0'),
     meson.get_compiler('vala').find_library('posix'),
 ]

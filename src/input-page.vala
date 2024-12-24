@@ -12,23 +12,22 @@ public class Aikadm.InputPage : Gtk.Box {
     private Common.Session[] sessions;
     int monitor;
     public bool is_busy { get; set; }
-    public string username  { get; set; }
+    public string username  { get; set; default = "**没有找到任何用户**"; }
     public string message { get; set; }
-    public string session_name { get; set; }
+    public string session_name { get; set; default = "没有找到任何会话，请检查 -d 选项"; }
     public string session_comment { get; set; }
+    public int user_index { get; set; default = -1; }
+    public int session_index { get; set; default = -1; }
     construct {
         notify.connect ((spec) => {
             switch (spec.name) {
-                case "username":
-                    set_avatar (username);
+                case "user-index":
+                    username = users[user_index].name;
+                    set_avatar (user_index);
                     break;
-                case "session_name":
-                    foreach (var s in sessions) {
-                        if (s.name == session_name) {
-                            session_comment = s.comment;
-                            break;
-                        }
-                    }
+                case "session-index":
+                    session_name = sessions[session_index].name;
+                    session_comment = sessions[session_index].comment;
                     break;
             }
         });
@@ -103,37 +102,21 @@ public class Aikadm.InputPage : Gtk.Box {
     }
 
     private void select_ueser (bool forward) {
-        int index = -1;
-        for (int i = 0; i < users.length; i++) {
-            if (users[i].name == username) {
-                index = i;
-                break;
-            }
-        }
-        if (index == -1)return;
+        if (users.length == 0)return;
         if (forward) {
-            index = (index + 1) % users.length;
+            user_index = (user_index + 1) % users.length;
         } else {
-            index = (index + users.length - 1) % users.length;
+            user_index = (user_index + users.length - 1) % users.length;
         }
-        username = users[index].name;
     }
 
     private void select_session (bool forward) {
-        int index = -1;
-        for (int i = 0; i < sessions.length; i++) {
-            if (sessions[i].name == session_name) {
-                index = i;
-                break;
-            }
-        }
-        if (index == -1)return;
+        if (sessions.length == 0)return;
         if (forward) {
-            index = (index + 1) % sessions.length;
+            session_index = (session_index + 1) % sessions.length;
         } else {
-            index = (index + sessions.length - 1) % sessions.length;
+            session_index = (session_index + sessions.length - 1) % sessions.length;
         }
-        session_name = sessions[index].name;
     }
 
     public void focus_password () {
@@ -142,21 +125,23 @@ public class Aikadm.InputPage : Gtk.Box {
         password.grab_focus ();
     }
 
-    private void set_avatar (string username) {
+    private void set_avatar (int user_index) {
         var monitors = Gdk.Display.get_default ().get_monitors ();
         var m = (Gdk.Monitor) monitors.get_item (monitor);
         var scale = m.get_scale ();
         var iconSize = (int) (scale * 252);
-        var path = Common.get_user_avatar (username);
-        if (path != null) {
-            var p = new Gdk.Pixbuf.from_file_at_scale (path, iconSize, iconSize, true);
-            avatar.set_paintable (Gdk.Texture.for_pixbuf (p));
-            avatar.queue_draw ();
-            return;
+        Gdk.Paintable icon = null;
+        if (users.length != 0) {
+            var path = Common.get_user_avatar (users[user_index].name);
+            if (path != null) {
+                var p = new Gdk.Pixbuf.from_file_at_scale (path, iconSize, iconSize, true);
+                icon = Gdk.Texture.for_pixbuf (p);
+            }
         }
-        var iconTheme = Gtk.IconTheme.get_for_display (Gdk.Display.get_default ());
-
-        var icon = iconTheme.lookup_icon ("people", null, iconSize, 1, Gtk.TextDirection.NONE, Gtk.IconLookupFlags.PRELOAD);
+        if (icon == null) {
+            var iconTheme = Gtk.IconTheme.get_for_display (Gdk.Display.get_default ());
+            icon = iconTheme.lookup_icon ("people", null, iconSize, 1, Gtk.TextDirection.NONE, Gtk.IconLookupFlags.PRELOAD);
+        }
         avatar.set_paintable (icon);
         avatar.queue_draw ();
     }
@@ -164,30 +149,17 @@ public class Aikadm.InputPage : Gtk.Box {
     public delegate void LoginRequestCallback (string messgae);
     public signal void login_request (Common.User user, string password, Common.Session session, LoginRequestCallback callback);
 
-    public void setup (int monitor, Common.User[] users, Common.Session[] sessions, string default_user, string default_session) {
+    public void setup (int monitor, Common.User[] users, Common.Session[] sessions, int default_user, int default_session) {
         this.users = users;
         this.sessions = sessions;
         this.monitor = monitor;
-        foreach (var u  in users) {
-            if (u.name == default_user) {
-                username = u.name;
-                break;
-            }
-        }
-        if (users.length > 0 && username == null)
-            username = users[0].name;
-
-        foreach (var s in sessions) {
-            if (s.name == default_session) {
-                session_name = s.name;
-                session_comment = s.comment;
-                break;
-            }
-        }
-        if (sessions.length > 0 && session_name == null) {
-            session_name = sessions[0].name;
-            session_comment = sessions[0].comment;
-        }
-        if (session_name == null)session_name = "没有找到任何会话，请检查 -d 选项";
+        if (default_user >= 0 && default_user < users.length)
+            user_index = default_user;
+        if (default_session >= 0 && default_session < sessions.length)
+            session_index = default_session;
+        if (users.length > 0 && user_index == -1)
+            user_index = 0;
+        if (sessions.length > 0 && session_index == -1)
+            session_index = 0;
     }
 }
