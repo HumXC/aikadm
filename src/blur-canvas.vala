@@ -5,12 +5,14 @@ public class Aikadm.BlurCanvas : Gtk.Box {
     private Gsk.Renderer renderer = new Gsk.NglRenderer();
     private Gdk.Texture texture;
     private Gdk.Texture blured;
-    public void set_texture(Gdk.Texture t, double scale_factor, int blur_radius, double brightness) {
+    public void set_texture(Gdk.Texture? t, double scale_factor, int blur_radius, double brightness) {
+        if (t == null)return;
         texture = t;
         this.preprocess(t, scale_factor, blur_radius, brightness);
     }
 
     public void draw(float x, float y, float w, float h) {
+        if (texture == null)return;
         float width = this.texture.get_width();
         float height = this.texture.get_height();
         w = w <= 0 ? width : w;

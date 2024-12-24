@@ -11,8 +11,13 @@ public class Aikadm.Wallpaper : Gtk.Box {
     var height = (int) (rect.height * scale);
     var img = Common.get_wallpaper (wallpaper, monitor);
     if (img == "")return;
-    var pixbuf = new Gdk.Pixbuf.from_file (img);
-    picture.set_paintable (Gdk.Texture.for_pixbuf (scale_and_center (pixbuf, width, height)));
+    try {
+      var pixbuf = new Gdk.Pixbuf.from_file (img);
+      if (pixbuf == null)return;
+      picture.set_paintable (Gdk.Texture.for_pixbuf (scale_and_center (pixbuf, width, height)));
+    } catch (Error e) {
+      log (e.message, GLib.LogLevelFlags.LEVEL_CRITICAL, "");
+    }
   }
 
   public Gdk.Paintable get_paintable () {
