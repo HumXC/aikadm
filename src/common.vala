@@ -138,7 +138,7 @@ namespace Common {
         }
 
         public void save () {
-            var f = GLib.File.new_for_path ("/tmp/aikadm");
+            var f = GLib.File.new_for_path ("/var/tmp/aikadm");
             if (f.query_exists (null))f.delete (null);
             var temp = f.create (GLib.FileCreateFlags.NONE, null);
             uint8[] buffer = new uint8[3];

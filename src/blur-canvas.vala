@@ -5,9 +5,6 @@ public class Aikadm.BlurCanvas : Gtk.Box {
     private Gsk.Renderer renderer = new Gsk.NglRenderer();
     private Gdk.Texture texture;
     private Gdk.Texture blured;
-    public BlurCanvas() {
-    }
-
     public void set_texture(Gdk.Texture t, double scale_factor, int blur_radius, double brightness) {
         texture = t;
         this.preprocess(t, scale_factor, blur_radius, brightness);
