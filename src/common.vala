@@ -125,7 +125,7 @@ namespace Common {
         public int session = 0;
         public int monitor = 0;
         public void load () {
-            var f = GLib.File.new_for_path ("/tmp/aikadm");
+            var f = GLib.File.new_for_path ("/var/tmp/aikadm");
             if (!f.query_exists (null))return;
             var temp = f.read (null);
             uint8[] buffer = new uint8[3];
