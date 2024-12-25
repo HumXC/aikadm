@@ -2,15 +2,10 @@
 , lib
 , makeWrapper
   # Build-Tools
-, lldb
 , pkg-config
 , vala
-, vala-lint
 , meson
-, mesonlsp
 , ninja
-, vala-language-server
-, uncrustify
 , blueprint-compiler
 , sass
   # Dependencies
@@ -19,24 +14,15 @@
 , astal-greet
 , librsvg
 }:
-
-let
-in
-
 stdenv.mkDerivation {
   depsBuildBuild = [
     pkg-config
   ];
   nativeBuildInputs = [
     makeWrapper
-    lldb
     vala
-    vala-lint
     meson
-    mesonlsp
     ninja
-    vala-language-server
-    uncrustify
     blueprint-compiler
     sass
   ];

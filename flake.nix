@@ -6,54 +6,24 @@
   };
 
   outputs = { self, flake-utils, nixpkgs, ... }@inputs:
-    flake-utils.lib.eachSystem [ "x86_64-linux" ] (system:
+    {
+      lib = import ./nix/lib self;
+    } //
+    flake-utils.lib.eachSystem [ "x86_64-linux" "aarch64-linux" ] (system:
       let
-        pkgs = import nixpkgs {
-          inherit system;
-        };
+        pkgs = import nixpkgs { inherit system; };
         astal = inputs.astal.packages.${system};
       in
-      rec {
-        packages.aikadm = pkgs.callPackage ./nix/package.nix {
-          astal-greet = astal.greet;
+      {
+        packages = {
+          aikadm = pkgs.callPackage ./nix/package.nix {
+            astal-greet = astal.greet;
+          };
+          aikadm-hyprland = self.lib.hyprland-script { inherit pkgs; };
+          aikadm-cage = self.lib.cage-script { inherit pkgs; };
         };
-        packages.aikadm-hyprland = lib.aikadm-hyprland-script {
-          defaultSession = "Hyprland";
-          debug = true;
-        };
-        lib = {
-          aikadm-hyprland-script = (args: (import ./nix/aikadm-hyprland-script.nix
-            ({
-              inherit pkgs;
-              aikadm = packages.aikadm;
-            } // args)
-          ));
-        };
-        devShells.default = pkgs.mkShell {
-          buildInputs =
-            (with pkgs;[
-              # Build-Tools
-              lldb
-              pkg-config
-              vala
-              vala-lint
-              meson
-              mesonlsp
-              ninja
-              vala-language-server
-              uncrustify
-              blueprint-compiler
-              sass
-              # Dependencies
-              gtk4
-              gtk4-layer-shell
-              librsvg
-            ]) ++ (with astal;[
-              greet
-            ]);
-          shellHook = ''
-            echo "${pkgs.lldb}/bin/lldb-dap"
-          '';
+        devShells = import ./nix/devshell.nix {
+          inherit pkgs astal;
         };
       }
     );

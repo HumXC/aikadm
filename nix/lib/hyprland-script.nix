@@ -1,5 +1,6 @@
+self:
 { pkgs
-, aikadm
+, aikadmPackage ? self.packages.${pkgs.system}.aikadm
 , hyprlandPackage ? pkgs.hyprland
 , hyprConf ? ""
 , wallpaperDir ? ""
@@ -13,7 +14,7 @@ let
     (concatMapStrings (e: " -e " + e + " ") (attrsets.mapAttrsToList (k: v: k + "= " + (toString v)) env));
 
   hyprConfFinal = pkgs.writeText "aika-greet-hyprland-conf" ''
-    exec-once = ${aikadm}/bin/aikadm ${argv}; ${hyprlandPackage}/bin/hyprctl dispatch exit
+    exec-once = ${aikadmPackage}/bin/aikadm ${argv}; ${hyprlandPackage}/bin/hyprctl dispatch exit
     ${hyprConf}
   '';
 in
