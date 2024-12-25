@@ -16,5 +16,5 @@ let
   cageEnvStr = concatStringsSep " " (mapAttrsToList (k: v: k + "=" + v) cageEnv);
 in
 pkgs.writeScript "aikadm-cage-script" ''
-  ${cagePackage}/bin/cage -- ${cageEnvStr} ${aikadmPackage}/bin/aikadm ${argv}
+  ${cageEnvStr} ${cagePackage}/bin/cage -- ${aikadmPackage}/bin/aikadm ${argv}
 ''
