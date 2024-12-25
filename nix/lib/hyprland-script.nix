@@ -11,7 +11,7 @@ let
   argv = with pkgs.lib;
     (optionalString (wallpaperDir != "") "-w ${wallpaperDir} ") +
     (concatMapStrings (sessionDir: "-d ${sessionDir} ") sessionDirs) +
-    (concatMapStrings (e: " -e " + e + " ") (attrsets.mapAttrsToList (k: v: k + "= " + (toString v)) env));
+    (concatMapStrings (e: " -e " + e + " ") (mapAttrsToList (k: v: k + "=" + (toString v)) env));
 
   hyprConfFinal = pkgs.writeText "aika-greet-hyprland-conf" ''
     exec-once = ${aikadmPackage}/bin/aikadm ${argv}; ${hyprlandPackage}/bin/hyprctl dispatch exit
