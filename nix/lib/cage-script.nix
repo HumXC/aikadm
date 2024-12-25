@@ -13,5 +13,5 @@ let
     (concatMapStrings (e: " -e " + e + " ") (attrsets.mapAttrsToList (k: v: k + "= " + (toString v)) env));
 in
 pkgs.writeScript "aikadm-cage-script" ''
-  ${cagePackage}/bin/cage ${aikadmPackage}/bin/aikadm "${argv}"
+  ${cagePackage}/bin/cage -- ${aikadmPackage}/bin/aikadm ${argv}
 ''
