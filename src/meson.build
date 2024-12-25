@@ -11,13 +11,11 @@ sources += [
 ]
 
 deps = [
-    dependency('gtk4-layer-shell-0'),
     dependency('gtk4'),
+    dependency('gtk4-layer-shell-0'),
     dependency('astal-greet-0.1'),
-    dependency('gdk-pixbuf-2.0'),
     meson.get_compiler('vala').find_library('posix'),
 ]
-add_project_arguments('-DGETTEXT_PACKAGE="' + meson.project_name() + '"', language: 'c')
 executable(
     'aikadm',
     sources,

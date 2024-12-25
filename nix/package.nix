@@ -1,5 +1,6 @@
 { stdenv
 , lib
+, makeWrapper
   # Build-Tools
 , lldb
 , pkg-config
@@ -15,7 +16,6 @@
   # Dependencies
 , gtk4
 , gtk4-layer-shell
-, gdk-pixbuf
 , astal-greet
 , librsvg
 }:
@@ -28,6 +28,7 @@ stdenv.mkDerivation {
     pkg-config
   ];
   nativeBuildInputs = [
+    makeWrapper
     lldb
     vala
     vala-lint
@@ -42,15 +43,26 @@ stdenv.mkDerivation {
   buildInputs = [
     gtk4
     gtk4-layer-shell
-    gdk-pixbuf
     astal-greet
-    librsvg
   ];
+  installPhase = ''
+    runHook preInstall
+    unset GDK_PIXBUF_MODULE_FILE
+    findGdkPixbufLoaders "${librsvg}"
+
+    mkdir -p $out/bin
+    cp src/aikadm $out/bin/.aikadm-unwrapped
+    echo $GDK_PIXBUF_MODULE_FILE
+    makeWrapper $out/bin/.aikadm-unwrapped $out/bin/aikadm \
+      --set GDK_PIXBUF_MODULE_FILE "$GDK_PIXBUF_MODULE_FILE"
+
+    runHook postInstall
+  '';
   name = "aikadm";
   src = ./..;
   meta = with lib; {
     homepage = "https://github.com/HumXC/aikadm";
     description = "";
-    license = licenses.mit;
+    license = licenses.gpl3;
   };
 }

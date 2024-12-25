@@ -30,8 +30,8 @@
           ));
         };
         devShells.default = pkgs.mkShell {
-          buildInputs = (with pkgs;
-            [
+          buildInputs =
+            (with pkgs;[
               # Build-Tools
               lldb
               pkg-config
@@ -47,11 +47,10 @@
               # Dependencies
               gtk4
               gtk4-layer-shell
-              gdk-pixbuf
               librsvg
             ]) ++ (with astal;[
-            greet
-          ]);
+              greet
+            ]);
           shellHook = ''
             echo "${pkgs.lldb}/bin/lldb-dap"
           '';
