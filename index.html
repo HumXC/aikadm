@@ -61,7 +61,10 @@
         </style>
 
         <script type="module">
-            import { GetSessions, GetUsers, GetUserAvatar, Login } from "./wailsjs/go/main/App";
+            const GetSessions = window["go"]["main"]["App"]["GetSessions"];
+            const GetUsers = window["go"]["main"]["App"]["GetUsers"];
+            const GetUserAvatar = window["go"]["main"]["App"]["GetUserAvatar"];
+            const Login = window["go"]["main"]["App"]["Login"];
             function updateMessage(msg) {
                 let message = document.getElementById("message");
                 message.value = msg;

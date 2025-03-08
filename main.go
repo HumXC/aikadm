@@ -10,7 +10,7 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
 )
 
-//go:embed all:frontend/dist
+//go:embed all:index.html
 var assets embed.FS
 var SessionDir = flag.String("d", "/usr/share/xsessions;/usr/share/wayland-sessions/", "Session directories to search for, use ; as separator")
 var Env = flag.String("e", "", "Environment to run in, use ; as separator")
