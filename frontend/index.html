@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+        <title>html-greet</title>
+        <style>
+            html {
+                background-color: rgba(27, 38, 54, 1);
+                text-align: center;
+                color: white;
+            }
+
+            body {
+                margin: 0;
+                color: white;
+            }
+            #app {
+                display: flex;
+                height: 100vh;
+            }
+            #avatar {
+                width: 100px;
+                height: 100px;
+                margin-bottom: 10px;
+            }
+            #user-info {
+                height: 155px;
+                width: 80%;
+            }
+            #session-info {
+                height: 266px;
+                width: 80%;
+            }
+            #login-btn,
+            #exit-btn,
+            #username,
+            #password,
+            #sessions,
+            #message {
+                width: 80%;
+            }
+            .input-box {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+                border: 2px solid #333;
+                padding: 10px;
+                width: 200px;
+            }
+            .discription {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+                border: 2px solid #333;
+                padding: 10px;
+                flex-grow: 1;
+            }
+        </style>
+
+        <script type="module">
+            import { GetSessions, GetUsers, GetUserAvatar, Login } from "./wailsjs/go/main/App";
+            function updateMessage(msg) {
+                let message = document.getElementById("message");
+                message.value = msg;
+            }
+            window.login = () => {
+                updateMessage("Login in progress...\nPlease wait...");
+                let username = document.getElementById("username").value;
+                let password = document.getElementById("password").value;
+                let session = document.getElementById("sessions").value;
+                let message = document.getElementById("message").value;
+                Login(username, password, session)
+                    .then(() => {
+                        updateMessage("Login success! You can now close this window.");
+                    })
+                    .catch((err) => updateMessage(err));
+            };
+            async function updateAvatar() {
+                let username = document.getElementById("username").value;
+                let avatar = await GetUserAvatar(username);
+                document.getElementById("avatar").src = "data:image/png;base64," + avatar;
+            }
+            async function updateUserInfo() {
+                let username = document.getElementById("username").value;
+                let users = await GetUsers();
+                let user = users.find((u) => u.Username === username);
+                if (user) {
+                    document.getElementById("user-info").value = JSON.stringify(user, null, 2);
+                }
+            }
+
+            async function updateSessionInfo() {
+                let sessionName = document.getElementById("sessions").value;
+                let sessions = await GetSessions();
+                let session = sessions.find((s) => s.Name === sessionName);
+                if (session) {
+                    document.getElementById("session-info").value = JSON.stringify(
+                        session,
+                        null,
+                        2
+                    );
+                }
+            }
+            async function getSessions() {
+                let sessions = await GetSessions();
+                let select = document.getElementById("sessions");
+                sessions.forEach((session) => {
+                    let newOption = document.createElement("option");
+                    newOption.value = session.Name;
+                    newOption.textContent = session.Name;
+                    select.appendChild(newOption);
+                });
+            }
+            async function getUsers() {
+                let users = await GetUsers();
+                let select = document.getElementById("username");
+                users.forEach((user) => {
+                    let newOption = document.createElement("option");
+                    newOption.value = user.Username;
+                    newOption.textContent = user.Username;
+                    select.appendChild(newOption);
+                });
+            }
+
+            document.getElementById("username").addEventListener("change", updateAvatar);
+            document.getElementById("username").addEventListener("change", updateUserInfo);
+            document.getElementById("sessions").addEventListener("change", updateSessionInfo);
+            getSessions().then(() => updateSessionInfo());
+            getUsers().then(() => {
+                updateAvatar();
+                updateUserInfo();
+            });
+        </script>
+    </head>
+
+    <body>
+        <div id="app">
+            <div class="input-box">
+                <img id="avatar" />
+                <span>Username</span>
+                <select id="username"></select>
+                <span>Password</span>
+                <input id="password" type="password" autocomplete="off" />
+                <span>Sessions</span>
+                <select id="sessions"></select>
+                <button id="login-btn" onclick="login()">Login</button>
+                <!-- window.runtime.Quit is defined in wailsjs/runtime/runtime.js -->
+                <button id="exit-btn" onclick="window.runtime.Quit()">Exit</button>
+            </div>
+            <div class="discription">
+                <span>User</span>
+                <textarea id="user-info" readonly></textarea>
+                <span>Session</span>
+                <textarea id="session-info" readonly></textarea>
+                <span>Message</span>
+                <textarea id="message">
+                    Hello! Welcome to html-greet. This is a demo application that demonstrates how to use HTML and JavaScript to build a desktop manager.
+                </textarea>
+            </div>
+        </div>
+    </body>
+</html>
