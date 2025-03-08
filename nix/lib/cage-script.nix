@@ -1,6 +1,6 @@
-self: {
+{
   pkgs,
-  html-greetPackage ? self.packages.${pkgs.system}.html-greet,
+  html-greet,
   cagePackage ? pkgs.cage,
   cageEnv ? {},
   sessionDirs ? [],
@@ -8,12 +8,11 @@ self: {
 }:
 with pkgs.lib; let
   argv =
-    "-d"
-    + (concatMapStrings (sessionDir: "${sessionDir};") sessionDirs)
-    + " -e "
-    + (concatMapStrings (e: e + ";") (mapAttrsToList (k: v: k + "=" + (toString v)) env));
+    (optionalString (sessionDirs != []) (" -d \"" + (concatMapStrings (sessionDir: "${sessionDir};") sessionDirs) + "\""))
+    + (optionalString (env != {}) (" -e \"" + (concatMapStrings (e: "${e};") (mapAttrsToList (k: v: k + "=" + (toString v)) env)) + "\""));
+
   cageEnvStr = concatStringsSep " " (mapAttrsToList (k: v: k + "=" + v) cageEnv);
 in
   pkgs.writeScript "html-greet-cage-script" ''
-    ${cageEnvStr} ${cagePackage}/bin/cage -- ${html-greetPackage}/bin/html-greet ${argv}
+    ${cageEnvStr} ${cagePackage}/bin/cage -- ${html-greet}/bin/html-greet ${argv}
   ''

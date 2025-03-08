@@ -6,7 +6,7 @@
   glib-networking,
   gsettings-desktop-schemas,
   gtk3,
-  webkitgtk,
+  webkitgtk_4_0,
   debug ? false,
 }:
 buildGoModule {
@@ -19,7 +19,7 @@ buildGoModule {
   nativeBuildInputs = [makeWrapper pkg-config];
   proxyVendor = true;
   allowGoReference = true;
-  buildInputs = [webkitgtk];
+  buildInputs = [webkitgtk_4_0];
   tags =
     [
       "desktop"
