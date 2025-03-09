@@ -119,21 +119,10 @@ func (a *App) GetUserAvatar(username string) (string, error) {
 //go:embed all:index.html
 var DefaultAssets embed.FS
 
-type AssetServer struct {
-	assetsPath string
-}
-
-func (a *AssetServer) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	switch req.URL.Path {
-	case "/":
-		if a.assetsPath == "" {
-			http.ServeFileFS(w, req, DefaultAssets, "index.html")
-		} else {
-			http.ServeFile(w, req, a.assetsPath)
-		}
-	}
-}
-
 func NewAssetServer(assetsPath string) http.Handler {
-	return &AssetServer{assetsPath}
+	if assetsPath == "" {
+		return http.FileServer(http.FS(DefaultAssets))
+	} else {
+		return http.FileServer(http.Dir(assetsPath))
+	}
 }

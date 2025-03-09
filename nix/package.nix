@@ -26,11 +26,7 @@ buildGoModule {
       "desktop"
       "production"
     ]
-    ++ (
-      if debug
-      then ["debug"]
-      else []
-    );
+    ++ (lib.optional debug ["debug" "devtools"]);
   ldflags = [
     "-s"
     "-w"
