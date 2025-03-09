@@ -2,10 +2,12 @@ package main
 
 import (
 	"context"
+	"embed"
 	"encoding/base64"
 	"fmt"
 	"io"
 	"io/fs"
+	"net/http"
 	"os"
 	"os/user"
 	"path/filepath"
@@ -112,4 +114,26 @@ func (a *App) GetUserAvatar(username string) (string, error) {
 		return buf.String(), nil
 	}
 	return "", fmt.Errorf("no avatar found for user %s", username)
+}
+
+//go:embed all:index.html
+var DefaultAssets embed.FS
+
+type AssetServer struct {
+	assetsPath string
+}
+
+func (a *AssetServer) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	switch req.URL.Path {
+	case "/":
+		if a.assetsPath == "" {
+			http.ServeFileFS(w, req, DefaultAssets, "index.html")
+		} else {
+			http.ServeFile(w, req, a.assetsPath)
+		}
+	}
+}
+
+func NewAssetServer(assetsPath string) http.Handler {
+	return &AssetServer{assetsPath}
 }

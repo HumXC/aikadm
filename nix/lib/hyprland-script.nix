@@ -3,14 +3,9 @@
   html-greet,
   hyprlandPackage ? pkgs.hyprland,
   hyprConf ? "",
-  sessionDirs ? [],
-  env ? {},
-}:
-with pkgs.lib; let
-  argv =
-    (optionalString (sessionDirs != []) (" -d \"" + (concatMapStrings (sessionDir: "${sessionDir};") sessionDirs) + "\""))
-    + (optionalString (env != {}) (" -e \"" + (concatMapStrings (e: "${e};") (mapAttrsToList (k: v: k + "=" + (toString v)) env)) + "\""));
-
+  ...
+} @ args: let
+  argv = import ./parse-argv.nix args;
   hyprConfFinal = pkgs.writeText "html-greet-hyprland-conf" ''
     exec-once = ${html-greet}/bin/html-greet ${argv}; ${hyprlandPackage}/bin/hyprctl dispatch exit
     ${hyprConf}

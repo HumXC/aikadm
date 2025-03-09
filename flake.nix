@@ -20,7 +20,15 @@
           import ./nix/lib/hyprland-script.nix ({inherit pkgs html-greet;} // args)
         );
         lib.cage-script = args: (
-          import ./nix/lib/cage-script.nix ({inherit pkgs html-greet;} // args)
+          import ./nix/lib/cage-script.nix ({
+              inherit pkgs html-greet;
+              sessionDir = ["/var/lib/html-greet" "/var/lib/html-greet/sessions"];
+              env = {
+                Path = "ddd";
+                XDG_DATA_DIRS = "/usr/share/ddd:/usr/local/share/ddd";
+              };
+            }
+            // args)
         );
         packages = {
           inherit html-greet;
