@@ -15,7 +15,7 @@
       "x86_64-linux"
     ];
   in {
-    overlays = import ./nix/overlays.nix;
+    overlays = import ./nix/overlays.nix {inherit nixpkgs frontend;};
     packages = forAllSystems (system: import ./nix/pkgs.nix {inherit nixpkgs system frontend;});
     devShells = forAllSystems (system: import ./nix/devshell.nix {inherit nixpkgs system;});
   };

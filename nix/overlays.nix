@@ -1,3 +1,11 @@
 {
-  default = final: _prev: import ./pkgs.nix {pkgs = final.pkgs;};
+  nixpkgs,
+  frontend,
+  ...
+}: {
+  default = final: _prev:
+    import ./pkgs.nix {
+      inherit nixpkgs frontend;
+      system = final.system;
+    };
 }
