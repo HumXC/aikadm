@@ -18,6 +18,27 @@
         "type": "github"
       }
     },
+    "frontend": {
+      "inputs": {
+        "flake-utils": "flake-utils",
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1741564302,
+        "narHash": "sha256-1QqC4GYq2qTg5T6Z7m1QD/MZLKjarbaTAn7w+JKV8wc=",
+        "owner": "HumXC",
+        "repo": "html-greet-frontend",
+        "rev": "8e39e88b1c6ab4dcd5c925bff5f78a69462a0427",
+        "type": "github"
+      },
+      "original": {
+        "owner": "HumXC",
+        "repo": "html-greet-frontend",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1741246872,
@@ -36,7 +57,7 @@
     },
     "root": {
       "inputs": {
-        "flake-utils": "flake-utils",
+        "frontend": "frontend",
         "nixpkgs": "nixpkgs"
       }
     },
