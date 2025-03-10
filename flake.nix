@@ -4,38 +4,14 @@
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = {
-    flake-utils,
-    nixpkgs,
-    ...
-  }:
-    flake-utils.lib.eachSystem ["x86_64-linux"] (
-      system: let
-        pkgs = import nixpkgs {
-          inherit system;
-        };
-        html-greet = pkgs.callPackage ./nix/package.nix {};
-      in rec {
-        lib.hyprland-script = args: (
-          import ./nix/lib/hyprland-script.nix ({inherit pkgs html-greet;} // args)
-        );
-        lib.cage-script = args: (
-          import ./nix/lib/cage-script.nix ({
-              inherit pkgs html-greet;
-              sessionDir = ["/var/lib/html-greet" "/var/lib/html-greet/sessions"];
-              env = {
-                Path = "ddd";
-                XDG_DATA_DIRS = "/usr/share/ddd:/usr/local/share/ddd";
-              };
-            }
-            // args)
-        );
-        packages = {
-          inherit html-greet;
-          html-greet-hyprland = lib.hyprland-script {};
-          html-greet-cage = lib.cage-script {};
-        };
-        devShells = import ./nix/devshell.nix {inherit pkgs;};
-      }
-    );
+  outputs = {nixpkgs, ...}: let
+    forAllSystems = nixpkgs.lib.genAttrs [
+      "aarch64-linux"
+      "x86_64-linux"
+    ];
+  in {
+    overlays = import ./nix/overlays.nix;
+    packages = forAllSystems (system: import ./nix/pkgs.nix {inherit nixpkgs system;});
+    devShells = forAllSystems (system: import ./nix/devshell.nix {inherit nixpkgs system;});
+  };
 }
