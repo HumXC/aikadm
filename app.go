@@ -2,12 +2,11 @@ package main
 
 import (
 	"context"
-	"embed"
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"io"
 	"io/fs"
-	"net/http"
 	"os"
 	"os/user"
 	"path/filepath"
@@ -116,13 +115,35 @@ func (a *App) GetUserAvatar(username string) (string, error) {
 	return "", fmt.Errorf("no avatar found for user %s", username)
 }
 
-//go:embed all:index.html
-var DefaultAssets embed.FS
+const ConfigPath = "/var/tmp/html-greet-config.json"
 
-func NewAssetServer(assetsPath string) http.Handler {
-	if assetsPath == "" {
-		return http.FileServer(http.FS(DefaultAssets))
-	} else {
-		return http.FileServer(http.Dir(assetsPath))
+func (a *App) ReadConfig() (any, error) {
+	if _, err := os.Stat(ConfigPath); os.IsNotExist(err) {
+		return nil, fmt.Errorf("config file not found: %s", ConfigPath)
 	}
+	f, err := os.Open(ConfigPath)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+	var config any
+	decoder := json.NewDecoder(f)
+	err = decoder.Decode(&config)
+	if err != nil {
+		return nil, err
+	}
+	return config, nil
+}
+func (a *App) SaveConfig(config any) error {
+	f, err := os.Create(ConfigPath)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	encoder := json.NewEncoder(f)
+	err = encoder.Encode(config)
+	if err != nil {
+		return err
+	}
+	return nil
 }
