@@ -14,6 +14,7 @@ import (
 	"strings"
 
 	"github.com/HumXC/html-greet/greetd"
+	"github.com/godbus/dbus/v5"
 	"github.com/rkoesters/xdg/desktop"
 )
 
@@ -113,6 +114,25 @@ func (a *App) GetUserAvatar(username string) (string, error) {
 		return buf.String(), nil
 	}
 	return "", fmt.Errorf("no avatar found for user %s", username)
+}
+func (a *App) Shutdown() error {
+	conn, err := dbus.SystemBus()
+	if err != nil {
+		return err
+	}
+	obj := conn.Object("org.freedesktop.login1", "/org/freedesktop/login1")
+	call := obj.Call("org.freedesktop.login1.Manager.PowerOff", 0, true)
+	return call.Err
+}
+
+func (a *App) Reboot() error {
+	conn, err := dbus.SystemBus()
+	if err != nil {
+		return err
+	}
+	obj := conn.Object("org.freedesktop.login1", "/org/freedesktop/login1")
+	call := obj.Call("org.freedesktop.login1.Manager.Reboot", 0, true)
+	return call.Err
 }
 
 const ConfigPath = "/var/tmp/html-greet-config.json"
