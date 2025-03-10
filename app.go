@@ -18,23 +18,50 @@ import (
 	"github.com/rkoesters/xdg/desktop"
 )
 
+type IApp interface {
+	startup(ctx context.Context)
+	Login(username, password, session string) error
+	GetSessions() ([]desktop.Entry, error)
+	GetUsers() ([]user.User, error)
+	GetUserAvatar(username string) (string, error)
+	Shutdown() error
+	Reboot() error
+	ReadConfig() (any, error)
+	SaveConfig(config any) error
+}
 type App struct {
 	ctx        context.Context
 	env        []string
 	sessionDir []string
+	dev        bool
+	mookApp    *MookApp
 }
 
+var _ IApp = (*App)(nil)
+
 func NewApp(sessionDir, env []string) *App {
-	return &App{
+	app := &App{
 		sessionDir: sessionDir,
 		env:        env,
+		mookApp: &MookApp{
+			sessionDir: sessionDir,
+			env:        env,
+		},
 	}
+	if _, ok := os.LookupEnv("GREETD_SOCK"); !ok {
+		app.dev = true
+	}
+	return app
 }
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
+	a.mookApp.startup(ctx)
 }
 
 func (a *App) Login(username, password, session string) error {
+	if a.dev {
+		return a.mookApp.Login(username, password, session)
+	}
 	sessions, err := a.GetSessions()
 	if err != nil {
 		return err
@@ -116,6 +143,9 @@ func (a *App) GetUserAvatar(username string) (string, error) {
 	return "", fmt.Errorf("no avatar found for user %s", username)
 }
 func (a *App) Shutdown() error {
+	if a.dev {
+		return a.mookApp.Shutdown()
+	}
 	conn, err := dbus.SystemBus()
 	if err != nil {
 		return err
@@ -126,6 +156,9 @@ func (a *App) Shutdown() error {
 }
 
 func (a *App) Reboot() error {
+	if a.dev {
+		return a.mookApp.Reboot()
+	}
 	conn, err := dbus.SystemBus()
 	if err != nil {
 		return err
