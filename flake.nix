@@ -14,11 +14,15 @@
       "aarch64-linux"
       "x86_64-linux"
     ];
-  in {
-    overlays = import ./nix/overlays.nix {inherit nixpkgs frontend;};
-    packages = forAllSystems (system: import ./nix/pkgs.nix {inherit nixpkgs system frontend;});
-    devShells = forAllSystems (system: import ./nix/devshell.nix {inherit nixpkgs system;});
-  };
+  in
+    {
+      lib = import ./nix/lib;
+    }
+    // {
+      overlays = import ./nix/overlays.nix {inherit nixpkgs frontend;};
+      packages = forAllSystems (system: import ./nix/pkgs.nix {inherit nixpkgs system frontend;});
+      devShells = forAllSystems (system: import ./nix/devshell.nix {inherit nixpkgs system;});
+    };
   nixConfig = {
     # substituers will be appended to the default substituters when fetching packages
     extra-substituters = [
