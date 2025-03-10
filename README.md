@@ -7,7 +7,7 @@ html-greet 是一个运行在 Linux 系统上的 Display Manager（登录管理�
 
 受 [Web-Greeter](https://github.com/JezerM/web-greeter) 启发，html-greet 旨在提供一个简单地方式实现登陆管理器，用户可以使用 web 技术轻松定制自己的登录界面。
 
-该项目主要借助 Wails 制作了一些后端 API 用于实现在 web 上不便于实现的功能，例如 Greetd 的调用，获取用户头像和配置文件的存储等。得利于 Wails 的绑定功能，前端的 js 可以直接调用这些 API。
+该项目主要借助 Wails 制作了一些后端 API 用于实现在 web 上不便于实现的功能，例如 Greetd 的调用，获取用户头像和配置文件的存储等。得益于 Wails 的绑定功能，前端的 js 可以直接调用这些 API。
 
 ## 快速开始
 
@@ -31,12 +31,14 @@ html-greet 是一个运行在 Linux 系统上的 Display Manager（登录管理�
      config,
      ...
     }: let
-     # argv 是提供给 html-greet 的命令行参数，详情查看 nix/lib/parse-argv.nix
-     argv = {
-       sessionDir = ["${config.services.displayManager.sessionData.desktops}/share"];
-       assets = "${pkgs.html-greet.frontend}/share/html-greet-frontend";
-     };
-     cmd = "${pkgs.html-greet.cage-script argv}";
+      # argv 是提供给 html-greet 的命令行参数，详情查看 nix/lib/parse-argv.nix
+      argv = {
+        inherit pkgs;
+        html-greet = pkgs.html-greet.default;
+        sessionDir = ["${config.services.  displayManager.sessionData.desktops}/share/  wayland-sessions"];
+        assets = "${pkgs.html-greet.frontend}/share/  html-greet-frontend";
+      };
+      cmd = "${inputs.html-greet.lib.cage-script argv}";
     in {
      config =  {
          nixpkgs.overlays = [ inputs.html-greet.overlays.default ];
@@ -70,7 +72,7 @@ html-greet 是一个运行在 Linux 系统上的 Display Manager（登录管理�
 0. 你应该首先了解 [Greetd](https://sr.ht/~kennylevinsen/greetd/) 的使用方法。请查看 Greetd 的文档。
 1. 关于 html-greet 的使用，请查看 `html-greet -h`
 
-你可以在登陆状态下直接运行 `html-greet` 预览其效果，但是如果你不使用 `-a` 参数，你只会看到一个丑陋的登陆界面。我还准备了一个前端，在 [html-greet-frontend](https://github.com/HumXC/html-greet-frontend)，你可以先构建这个前端或者由编写你自己的前端，再使用 `html-greet -a <path-to-frontend>` 启动。
+你可以在登陆状态下直接运行 `html-greet` 预览其效果，但是如果你不使用 `-a` 参数，你只会看到一个丑陋的登陆界面。我还准备了一个前端，在 [html-greet-frontend](https://github.com/HumXC/html-greet-frontend)，你可以先构建这个前端或者编写你自己的前端，再使用 `html-greet -a <path-to-frontend>` 启动。
 
 ## 前端
 
