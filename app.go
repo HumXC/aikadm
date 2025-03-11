@@ -16,12 +16,13 @@ import (
 	"github.com/HumXC/html-greet/greetd"
 	"github.com/godbus/dbus/v5"
 	"github.com/rkoesters/xdg/desktop"
+	"github.com/rkoesters/xdg/keyfile"
 )
 
 type IApp interface {
 	startup(ctx context.Context)
 	Login(username, password, session string) error
-	GetSessions() ([]desktop.Entry, error)
+	GetSessions() ([]SessionEntry, error)
 	GetUsers() ([]user.User, error)
 	GetUserAvatar(username string) (string, error)
 	Shutdown() error
@@ -68,15 +69,26 @@ func (a *App) Login(username, password, session string) error {
 	}
 	for _, s := range sessions {
 		if s.Name == session {
-			cmd := s.Exec
+			cmd := []string{s.Exec}
 			env := a.env
-			return greetd.Login(username, password, []string{cmd}, env)
+			if s.SessionType == "xorg" {
+				env = append(env, "DISPLAY=:0")
+				cmd = append([]string{"Xorg :0 vt1 -nolisten tcp"}, cmd...)
+			}
+			return greetd.Login(username, password, cmd, env)
 		}
 	}
 	return fmt.Errorf("session %s not found", session)
 }
-func (a *App) GetSessions() ([]desktop.Entry, error) {
-	result := []desktop.Entry{}
+
+type SessionEntry struct {
+	desktop.Entry
+	Type        string
+	SessionType string
+}
+
+func (a *App) GetSessions() ([]SessionEntry, error) {
+	result := []SessionEntry{}
 	for _, dir := range a.sessionDir {
 		err := filepath.WalkDir(dir, func(path string, d fs.DirEntry, err error) error {
 			if err != nil {
@@ -98,7 +110,26 @@ func (a *App) GetSessions() ([]desktop.Entry, error) {
 			if err != nil {
 				return err
 			}
-			result = append(result, *desktopEntry)
+			f.Seek(0, io.SeekStart)
+			kf, err := keyfile.New(f)
+			if err != nil {
+				return err
+			}
+			typeStr := kf.Value("Desktop Entry", "Type")
+			sessionType := ""
+			baseDir := filepath.Base(filepath.Dir(path))
+			if baseDir == "xsessions" {
+				sessionType = "xorg"
+			}
+			if baseDir == "wayland-sessions" {
+				sessionType = "wayland"
+			}
+			sessionEntry := SessionEntry{
+				Entry:       *desktopEntry,
+				Type:        typeStr,
+				SessionType: sessionType,
+			}
+			result = append(result, sessionEntry)
 			return nil
 		})
 		if err != nil {

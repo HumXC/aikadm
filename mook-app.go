@@ -4,8 +4,6 @@ import (
 	"context"
 	"fmt"
 	"os/user"
-
-	"github.com/rkoesters/xdg/desktop"
 )
 
 type MookApp struct {
@@ -14,7 +12,7 @@ type MookApp struct {
 	sessionDir []string
 }
 
-func (m *MookApp) GetSessions() ([]desktop.Entry, error) {
+func (m *MookApp) GetSessions() ([]SessionEntry, error) {
 	panic("unimplemented")
 }
 
