@@ -13,11 +13,13 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"syscall"
 
 	"github.com/HumXC/html-greet/greetd"
 	"github.com/godbus/dbus/v5"
 	"github.com/rkoesters/xdg/desktop"
 	"github.com/rkoesters/xdg/keyfile"
+	pkgLogger "github.com/wailsapp/wails/v2/pkg/logger"
 )
 
 type IApp interface {
@@ -36,6 +38,7 @@ type App struct {
 	env        []string
 	sessionDir []string
 	dev        bool
+	logger     pkgLogger.Logger
 	mookApp    *MookApp
 }
 
@@ -45,6 +48,7 @@ func NewApp(sessionDir, env []string) *App {
 	app := &App{
 		sessionDir: sessionDir,
 		env:        env,
+		logger:     pkgLogger.NewDefaultLogger(),
 		mookApp: &MookApp{
 			sessionDir: sessionDir,
 			env:        env,
@@ -100,7 +104,8 @@ func (a *App) GetSessions() ([]SessionEntry, error) {
 	for _, dir := range a.sessionDir {
 		err := filepath.WalkDir(dir, func(path string, d fs.DirEntry, err error) error {
 			if err != nil {
-				return err
+				a.logger.Error(err.Error())
+				return nil
 			}
 			if d.IsDir() {
 				return nil
@@ -240,8 +245,32 @@ func (a *App) SaveConfig(config any) error {
 	return nil
 }
 
-func (a *App) Exec(command []string) (result string, err error) {
+func (a *App) exec(command []string) *exec.Cmd {
 	cmd := exec.Command(command[0], command[1:]...)
+	a.logger.Info(fmt.Sprintf("executed command: [%s]", strings.Join(cmd.Args, " ")))
+	return cmd
+}
+func (a *App) Exec(command []string) (int, error) {
+	cmd := a.exec(command)
+	err := cmd.Start()
+	if err != nil {
+		return 0, fmt.Errorf("failed to execute command: [%s] : %s", strings.Join(cmd.Args, " "), err.Error())
+	}
+	return cmd.Process.Pid, nil
+}
+func (a *App) KillProcess(pid int) error {
+	process, err := os.FindProcess(pid)
+	if err != nil {
+		return err
+	}
+	err = process.Signal(syscall.SIGTERM)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+func (a *App) ExecOutput(command []string) (result string, err error) {
+	cmd := a.exec(command)
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		return "", fmt.Errorf("failed to execute command: [%s] : %s %s", strings.Join(cmd.Args, " "), err.Error(), string(output))
