@@ -8,6 +8,7 @@ import (
 	"io"
 	"io/fs"
 	"os"
+	"os/exec"
 	"os/user"
 	"path/filepath"
 	"strconv"
@@ -237,4 +238,13 @@ func (a *App) SaveConfig(config any) error {
 		return err
 	}
 	return nil
+}
+
+func (a *App) Exec(command []string) (result string, err error) {
+	cmd := exec.Command(command[0], command[1:]...)
+	output, err := cmd.Output()
+	if err != nil {
+		return "", err
+	}
+	return string(output), nil
 }

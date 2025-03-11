@@ -2,13 +2,11 @@ package main
 
 import (
 	"embed"
-	"fmt"
 	"io/fs"
 	"os"
 	"path/filepath"
 	"strings"
 
-	"github.com/HumXC/html-greet/backend"
 	"github.com/urfave/cli/v2"
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
@@ -37,11 +35,6 @@ func NewCli() *cli.App {
 				Value:   "",
 				Usage:   "Set of assets to serve",
 			},
-			&cli.StringFlag{
-				Name:    "backend",
-				Aliases: []string{"b"},
-				Usage:   "Use the specified backend. value: cage | hyprland",
-			},
 		},
 		Commands: []*cli.Command{
 			{
@@ -67,24 +60,7 @@ func CmdMain(ctx *cli.Context) error {
 			env = append(env, triped)
 		}
 	}
-	backendName := ctx.String("backend")
-	if backendName != "" {
-		var args []string
 
-		for i := 0; i < len(os.Args); i++ {
-			if os.Args[i] == "--backend" || os.Args[i] == "-b" {
-				i++
-				continue
-			}
-			args = append(args, os.Args[i])
-		}
-
-		backned := backend.Get(backendName)
-		if backned == nil {
-			return fmt.Errorf("backend %s not found", backendName)
-		}
-		return backned.Start(args)
-	}
 	app := NewApp(sessionDir, env)
 
 	err := wails.Run(&options.App{
