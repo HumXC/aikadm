@@ -72,8 +72,14 @@ func (a *App) Login(username, password, session string) error {
 			cmd := []string{s.Exec}
 			env := a.env
 			if s.SessionType == "xorg" {
+				tty, err := os.ReadFile("/sys/class/tty/tty0/active")
+				if err != nil {
+					return err
+				}
+				xorg := fmt.Sprintf("Xorg :0 vt%s", strings.TrimPrefix(string(tty), "tty"))
+				fmt.Println(xorg)
 				env = append(env, "DISPLAY=:0")
-				cmd = append([]string{"Xorg :0 vt1 -nolisten tcp"}, cmd...)
+				cmd = append([]string{xorg}, cmd...)
 			}
 			return greetd.Login(username, password, cmd, env)
 		}
