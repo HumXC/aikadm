@@ -7,11 +7,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1741698670,
-        "narHash": "sha256-0qys6VzFE2+/PFiOoW0WomnBzS7WcGMsTmUJQGn+IWc=",
+        "lastModified": 1741699512,
+        "narHash": "sha256-WxOpQemOM1UTLfOxYRE80hAFcmLXE/fEOnZmjLhGOFM=",
         "owner": "HumXC",
         "repo": "html-greet-frontend",
-        "rev": "1f5f267600358b8d3a3bc6500a8da1c6b9c9000a",
+        "rev": "3993a5b30017eca421e67cd49d98ad9d1b8770e9",
         "type": "github"
       },
       "original": {
