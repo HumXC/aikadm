@@ -242,9 +242,9 @@ func (a *App) SaveConfig(config any) error {
 
 func (a *App) Exec(command []string) (result string, err error) {
 	cmd := exec.Command(command[0], command[1:]...)
-	output, err := cmd.Output()
+	output, err := cmd.CombinedOutput()
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to execute command: [%s] : %s %s", strings.Join(cmd.Args, " "), err.Error(), string(output))
 	}
 	return string(output), nil
 }
