@@ -76,6 +76,7 @@ func (a *App) Login(username, password, session string) error {
 				if err != nil {
 					return err
 				}
+				// FIXME
 				xorg := fmt.Sprintf("Xorg :0 vt%s", strings.TrimPrefix(string(tty), "tty"))
 				fmt.Println(xorg)
 				env = append(env, "DISPLAY=:0")
