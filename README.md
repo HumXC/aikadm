@@ -77,7 +77,7 @@ html-greet 是一个运行在 Linux 系统上的 Display Manager（登录管理�
 1. 你应该首先了解 [Greetd](https://sr.ht/~kennylevinsen/greetd/) 的使用方法。请查看 Greetd 的官方文档或查看 [Greetd Archwiki](https://wiki.archlinux.org/title/Greetd)。
 2. 关于 html-greet 的使用，请查看 `html-greet -h`
 
-你可以在桌面环境下直接运行 `html-greet` 预览其效果，但是如果你不使用 `-a` 参数，你只会看到一个丑陋的登陆界面。我还准备了一个前端，在 [html-greet-frontend](https://github.com/HumXC/html-greet-frontend)，你可以先构建这个前端或者编写你自己的前端，再使用 `html-greet -a <path-to-frontend>` 启动。
+你可以在桌面环境下直接运行 `html-greet` 预览其效果，但是如果你不使用 `-a` 参数，你只会看到一个丑陋的登陆界面。我还准备了一个前端，在 [html-greet-frontend](https://github.com/HumXC/html-greet-frontend)，你可以先构建这个前端或者编写你自己的前端，再使用 `html-greet -a <path-to-frontend>` 启动。-a 参数也可以是一个 url，例如 `html-greet -a https://humxc.github.io/html-greet-frontend/` 这在调试前端时非常有用，你也可以用于在线预览可用的前端。
 
 跟其他大部分 greetd 的 dm 一样，html-greet 需要一个混成器来显示画面。例如 cage, sway, hyprland 等。在这里我推荐使用 [Cage](https://github.com/cage-kiosk/cage)，因为 cage 足够简单，非常适合这种场景。
 
@@ -101,6 +101,8 @@ html-greet 会默认搜索 `/usr/share/xsessions` 和 `/usr/share/wayland-sessio
 html-greet 自带了一个前端，就在 [index.html](https://github.com/HumXC/html-greet/blob/main/index.html) 中。关于如何编写前端，与 html-greet 相关的部分你可以运行 `html-greet wailsjs` 命令，这会在当前目录下输出 wailsjs 文件夹，这是由 Wails 生成的。你可以在前端项目中导入 wailsjs 中的代码，其中有用于实现登陆管理器功能的关键函数。
 
 你可以查看 [html-greet-frontend](https://github.com/HumXC/html-greet-frontend/blob/main/src/components/LoginScreen.vue#L162) 了解如何使用 wailsjs 中的代码。
+
+[预览 html-greet-frontend](https://humxc.github.io/html-greet-frontend/)
 
 ## 参考
 
