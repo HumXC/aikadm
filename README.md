@@ -2,7 +2,6 @@
 
 > [!WARNING]
 > 该项目还在开发中！功能尚不稳定！请小心每一次更新！
-> 尚不支持 Xorg
 
 html-greet 是一个运行在 Linux 系统上的 Display Manager（登录管理器）。基于 [Wails](https://github.com/wailsapp/wails) 构建，借助 [Greetd](https://sr.ht/~kennylevinsen/greetd/) 实现用户登陆。
 
