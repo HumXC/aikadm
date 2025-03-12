@@ -36,8 +36,8 @@ html-greet 是一个运行在 Linux 系统上的 Display Manager（登录管理�
       argv = {
         inherit pkgs;
         html-greet = pkgs.html-greet.default;
-        sessionDir = ["${config.services.  displayManager.sessionData.desktops}/share/  wayland-sessions"];
-        assets = "${pkgs.html-greet.frontend}/share/  html-greet-frontend";
+        sessionDir = [config.services.displayManager.sessionData.desktops.out];
+        assets = "${pkgs.html-greet.frontend}/share/html-greet-frontend";
       };
       cmd = "${inputs.html-greet.lib.cage-script argv}";
     in {
