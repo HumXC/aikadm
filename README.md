@@ -2,6 +2,7 @@
 
 > [!WARNING]
 > 该项目还在开发中！功能尚不稳定！请小心每一次更新！
+> 尚不支持 Xorg
 
 html-greet 是一个运行在 Linux 系统上的 Display Manager（登录管理器）。基于 [Wails](https://github.com/wailsapp/wails) 构建，借助 [Greetd](https://sr.ht/~kennylevinsen/greetd/) 实现用户登陆。
 
@@ -69,10 +70,31 @@ html-greet 是一个运行在 Linux 系统上的 Display Manager（登录管理�
 
 #### 使用
 
-0. 你应该首先了解 [Greetd](https://sr.ht/~kennylevinsen/greetd/) 的使用方法。请查看 Greetd 的文档。
-1. 关于 html-greet 的使用，请查看 `html-greet -h`
+0. 依赖:
 
-你可以在登陆状态下直接运行 `html-greet` 预览其效果，但是如果你不使用 `-a` 参数，你只会看到一个丑陋的登陆界面。我还准备了一个前端，在 [html-greet-frontend](https://github.com/HumXC/html-greet-frontend)，你可以先构建这个前端或者编写你自己的前端，再使用 `html-greet -a <path-to-frontend>` 启动。
+    - webkit2gtk
+
+1. 你应该首先了解 [Greetd](https://sr.ht/~kennylevinsen/greetd/) 的使用方法。请查看 Greetd 的官方文档或查看 [Greetd Archwiki](https://wiki.archlinux.org/title/Greetd)。
+2. 关于 html-greet 的使用，请查看 `html-greet -h`
+
+你可以在桌面环境下直接运行 `html-greet` 预览其效果，但是如果你不使用 `-a` 参数，你只会看到一个丑陋的登陆界面。我还准备了一个前端，在 [html-greet-frontend](https://github.com/HumXC/html-greet-frontend)，你可以先构建这个前端或者编写你自己的前端，再使用 `html-greet -a <path-to-frontend>` 启动。
+
+跟其他大部分 greetd 的 dm 一样，html-greet 需要一个混成器来显示画面。例如 cage, sway, hyprland 等。在这里我推荐使用 [Cage](https://github.com/cage-kiosk/cage)，因为 cage 足够简单，非常适合这种场景。
+
+##### 配置 Greetd
+
+通过查阅 Greetd 的文档，你应该已经知道如何配置 Greetd，以下是一个配置的示例
+
+```toml
+[default_session]
+command = "cage -s -- html-greet -a /path/to/html-greet-frontend"
+user = "greeter"
+
+[terminal]
+vt = 1
+```
+
+html-greet 会默认搜索 `/usr/share/xsessions` 和 `/usr/share/wayland-sessions` 中的 `.desktop` 文件，并通过 xsessions 和 wayland-sessions 目录来判断一个 session 是 Xorg 还是 Wayland。如果你 html-greet 找不到任何一个 session，你可能需要检查这两个文件夹。你也可以通过 -d 参数指定 session 搜索的目录。
 
 ## 前端
 
