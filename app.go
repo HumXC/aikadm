@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
+	"log"
 	"os"
 	"os/exec"
 	"os/user"
@@ -19,10 +20,9 @@ import (
 	"github.com/godbus/dbus/v5"
 	"github.com/rkoesters/xdg/desktop"
 	"github.com/rkoesters/xdg/keyfile"
-	pkgLogger "github.com/wailsapp/wails/v2/pkg/logger"
 )
 
-type IApp interface {
+type IHtmlGreet interface {
 	startup(ctx context.Context)
 	Login(username, password, session string) error
 	GetSessions() ([]SessionEntry, error)
@@ -33,22 +33,22 @@ type IApp interface {
 	ReadConfig() (any, error)
 	SaveConfig(config any) error
 }
-type App struct {
+type HtmlGreet struct {
 	ctx        context.Context
 	env        []string
 	sessionDir []string
 	dev        bool
-	logger     pkgLogger.Logger
+	logger     *log.Logger
 	mookApp    *MookApp
 }
 
-var _ IApp = (*App)(nil)
+var _ IHtmlGreet = (*HtmlGreet)(nil)
 
-func NewApp(sessionDir, env []string) *App {
-	app := &App{
+func NewApp(sessionDir, env []string) *HtmlGreet {
+	app := &HtmlGreet{
 		sessionDir: sessionDir,
 		env:        env,
-		logger:     pkgLogger.NewDefaultLogger(),
+		logger:     log.New(os.Stdout, "html-greet: ", log.LstdFlags),
 		mookApp: &MookApp{
 			sessionDir: sessionDir,
 			env:        env,
@@ -59,12 +59,11 @@ func NewApp(sessionDir, env []string) *App {
 	}
 	return app
 }
-func (a *App) startup(ctx context.Context) {
+func (a *HtmlGreet) startup(ctx context.Context) {
 	a.ctx = ctx
 	a.mookApp.startup(ctx)
 }
-
-func (a *App) Login(username, password, session string) error {
+func (a *HtmlGreet) Login(username, password, session string) error {
 	if a.dev {
 		return a.mookApp.Login(username, password, session)
 	}
@@ -91,12 +90,12 @@ type SessionEntry struct {
 	SessionType string
 }
 
-func (a *App) GetSessions() ([]SessionEntry, error) {
+func (a *HtmlGreet) GetSessions() ([]SessionEntry, error) {
 	result := []SessionEntry{}
 	for _, dir := range a.sessionDir {
 		err := filepath.WalkDir(dir, func(path string, d fs.DirEntry, err error) error {
 			if err != nil {
-				a.logger.Error(err.Error())
+				a.logger.Println(err)
 				return nil
 			}
 			if d.IsDir() {
@@ -143,7 +142,7 @@ func (a *App) GetSessions() ([]SessionEntry, error) {
 	}
 	return result, nil
 }
-func (a *App) GetUsers() ([]user.User, error) {
+func (a *HtmlGreet) GetUsers() ([]user.User, error) {
 	result := []user.User{}
 	for i := 1000; i < 60000; i++ {
 		user, err := user.LookupId(strconv.Itoa(i))
@@ -154,7 +153,7 @@ func (a *App) GetUsers() ([]user.User, error) {
 	}
 	return result, nil
 }
-func (a *App) GetUserAvatar(username string) (string, error) {
+func (a *HtmlGreet) GetUserAvatar(username string) (string, error) {
 	user, err := user.Lookup(username)
 	if err != nil {
 		return "", err
@@ -178,7 +177,7 @@ func (a *App) GetUserAvatar(username string) (string, error) {
 	}
 	return "", fmt.Errorf("no avatar found for user %s", username)
 }
-func (a *App) Shutdown() error {
+func (a *HtmlGreet) Shutdown() error {
 	if a.dev {
 		return a.mookApp.Shutdown()
 	}
@@ -191,7 +190,7 @@ func (a *App) Shutdown() error {
 	return call.Err
 }
 
-func (a *App) Reboot() error {
+func (a *HtmlGreet) Reboot() error {
 	if a.dev {
 		return a.mookApp.Reboot()
 	}
@@ -206,7 +205,7 @@ func (a *App) Reboot() error {
 
 const ConfigPath = "/var/tmp/html-greet-config.json"
 
-func (a *App) ReadConfig() (any, error) {
+func (a *HtmlGreet) ReadConfig() (any, error) {
 	if _, err := os.Stat(ConfigPath); os.IsNotExist(err) {
 		return nil, fmt.Errorf("config file not found: %s", ConfigPath)
 	}
@@ -223,7 +222,7 @@ func (a *App) ReadConfig() (any, error) {
 	}
 	return config, nil
 }
-func (a *App) SaveConfig(config any) error {
+func (a *HtmlGreet) SaveConfig(config any) error {
 	f, err := os.Create(ConfigPath)
 	if err != nil {
 		return err
@@ -237,12 +236,12 @@ func (a *App) SaveConfig(config any) error {
 	return nil
 }
 
-func (a *App) exec(command []string) *exec.Cmd {
+func (a *HtmlGreet) exec(command []string) *exec.Cmd {
 	cmd := exec.Command(command[0], command[1:]...)
-	a.logger.Info(fmt.Sprintf("executed command: [%s]", strings.Join(cmd.Args, " ")))
+	a.logger.Printf("executed command: [%s]", strings.Join(cmd.Args, " "))
 	return cmd
 }
-func (a *App) Exec(command []string) (int, error) {
+func (a *HtmlGreet) Exec(command []string) (int, error) {
 	cmd := a.exec(command)
 	err := cmd.Start()
 	if err != nil {
@@ -250,7 +249,7 @@ func (a *App) Exec(command []string) (int, error) {
 	}
 	return cmd.Process.Pid, nil
 }
-func (a *App) KillProcess(pid int) error {
+func (a *HtmlGreet) KillProcess(pid int) error {
 	process, err := os.FindProcess(pid)
 	if err != nil {
 		return err
@@ -261,7 +260,7 @@ func (a *App) KillProcess(pid int) error {
 	}
 	return nil
 }
-func (a *App) ExecOutput(command []string) (result string, err error) {
+func (a *HtmlGreet) ExecOutput(command []string) (result string, err error) {
 	cmd := a.exec(command)
 	output, err := cmd.CombinedOutput()
 	if err != nil {

@@ -5,15 +5,18 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"os"
 	"strings"
+
+	"github.com/wailsapp/wails/v3/pkg/application"
 )
 
-//go:embed all:index.html
+//go:embed all:frontend
 var DefaultAssets embed.FS
 
 func NewAssetServer(assetsPath string) http.Handler {
 	if assetsPath == "" {
-		return http.FileServer(http.FS(DefaultAssets))
+		return application.AssetFileServerFS(DefaultAssets)
 	}
 
 	if target, err := url.Parse(assetsPath); err == nil && target.Scheme != "" {
@@ -27,5 +30,5 @@ func NewAssetServer(assetsPath string) http.Handler {
 		}
 		return proxy
 	}
-	return http.FileServer(http.Dir(assetsPath))
+	return application.AssetFileServerFS(os.DirFS(assetsPath))
 }

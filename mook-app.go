@@ -58,4 +58,4 @@ func (m *MookApp) startup(ctx context.Context) {
 	m.ctx = ctx
 }
 
-var _ IApp = (*MookApp)(nil)
+var _ IHtmlGreet = (*MookApp)(nil)

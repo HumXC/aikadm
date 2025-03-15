@@ -1,13 +1,14 @@
 {
   lib,
+  frontend,
   makeWrapper,
   pkg-config,
   buildGoModule,
   glib-networking,
   gsettings-desktop-schemas,
   gtk3,
-  webkitgtk_4_0,
-  wails,
+  webkitgtk_4_1,
+  wails3,
   debug ? false,
 }:
 buildGoModule {
@@ -16,11 +17,11 @@ buildGoModule {
 
   src = ./..;
 
-  vendorHash = "sha256-TNfL809d/rWAY8fETGEJjMcWv20Ijk6dqffzPU4Epqs=";
-  nativeBuildInputs = [makeWrapper pkg-config wails];
+  vendorHash = "sha256-xP5qMj5H81n6JYZdyN6k0OdGHpDHCin/h1iNL4/KOuk=";
+  nativeBuildInputs = [makeWrapper pkg-config wails3];
   proxyVendor = true;
   allowGoReference = true;
-  buildInputs = [webkitgtk_4_0];
+  buildInputs = [webkitgtk_4_1];
   tags =
     [
       "desktop"
@@ -32,15 +33,11 @@ buildGoModule {
     "-w"
   ];
   preBuild = ''
-    mkdir -p frontend/wailsjs
-    # Make sure 'wails generate module' can work
-    touch frontend/wailsjs/keep
-    echo "{}" > wails.json
-    wails generate module
-    rm frontend/wailsjs/keep
+    mkdir frontend
+    cp -r ${frontend}/share/html-greet-frontend/* frontend/
+    wails3 generate bindings
   '';
   postBuild = ''
-    rm -r frontend wails.json
   '';
   # https://wails.io/docs/guides/nixos-font/
   postFixup = ''

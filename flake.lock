@@ -1,17 +1,17 @@
 {
   "nodes": {
-    "frontend": {
+    "html-greet-frontend": {
       "inputs": {
         "nixpkgs": [
           "nixpkgs"
         ]
       },
       "locked": {
-        "lastModified": 1741773293,
-        "narHash": "sha256-h38MO9XvRGHjvc8evah8LgKhzyao753iQgKYrGQTYIc=",
+        "lastModified": 1742041418,
+        "narHash": "sha256-zLZYFzKEjzEv05UUml+SHPX2q5I6o+Hq4keEXtVDK2k=",
         "owner": "HumXC",
         "repo": "html-greet-frontend",
-        "rev": "107b1b64a3f56a5161ff87b99a52c1977e29e6c0",
+        "rev": "0f6bce95a73f3abe376a439045d337b5c2a67040",
         "type": "github"
       },
       "original": {
@@ -38,7 +38,7 @@
     },
     "root": {
       "inputs": {
-        "frontend": "frontend",
+        "html-greet-frontend": "html-greet-frontend",
         "nixpkgs": "nixpkgs"
       }
     }

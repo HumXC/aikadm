@@ -1,12 +1,14 @@
 {
   nixpkgs,
   system,
-  frontend,
+  html-greet-frontend,
   ...
 }: let
   pkgs = import nixpkgs {inherit system;};
-  html-greet = pkgs.callPackage ./package.nix {};
+  frontend = html-greet-frontend.packages.${system}.default;
+  wails3 = pkgs.callPackage ./wails3.nix {};
+  html-greet = pkgs.callPackage ./package.nix {inherit frontend wails3;};
 in {
   default = html-greet;
-  frontend = frontend.packages.${system}.default;
+  wails3 = wails3;
 }

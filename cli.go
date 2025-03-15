@@ -1,16 +1,12 @@
 package main
 
 import (
-	"embed"
-	"io/fs"
 	"os"
-	"path/filepath"
+	"os/exec"
 	"strings"
 
 	"github.com/urfave/cli/v2"
-	"github.com/wailsapp/wails/v2"
-	"github.com/wailsapp/wails/v2/pkg/options"
-	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
+	"github.com/wailsapp/wails/v3/pkg/application"
 )
 
 func NewCli() *cli.App {
@@ -36,16 +32,17 @@ func NewCli() *cli.App {
 				Usage:   "Set of assets to serve",
 			},
 		},
-		Commands: []*cli.Command{
-			{
-				Name:   "wailsjs",
-				Usage:  "Output wailsjs folder to current directory (defaulr: ./wailsjs)",
-				Action: CmdWailsjs,
-			}},
 	}
 
 }
 func CmdMain(ctx *cli.Context) error {
+	if sock := os.Getenv("GREETD_SOCK"); sock != "" {
+		cmd := exec.Command("cage", "-s", "--", strings.Join(os.Args, " "))
+		return cmd.Run()
+	}
+	if os.Getenv("XDG_SESSION_TYPE") == "wayland" {
+		os.Setenv("GDK_BACKEND", "wayland")
+	}
 	var sessionDir []string
 	var env []string
 	for _, dir := range ctx.StringSlice("session-dir") {
@@ -61,52 +58,18 @@ func CmdMain(ctx *cli.Context) error {
 		}
 	}
 
-	app := NewApp(sessionDir, env)
-
-	err := wails.Run(&options.App{
-		Title:      "html-greet",
-		Width:      1024,
-		Height:     768,
-		Frameless:  true,
-		Fullscreen: true,
-		AssetServer: &assetserver.Options{
+	app := application.New(application.Options{
+		Name: "html-greet",
+		Assets: application.AssetOptions{
 			Handler: NewAssetServer(ctx.String("assets")),
 		},
-		BackgroundColour: &options.RGBA{R: 27, G: 38, B: 54, A: 1},
-		OnStartup:        app.startup,
-		Bind: []any{
-			app,
+		Services: []application.Service{
+			application.NewService(NewApp(sessionDir, env)),
 		},
 	})
-
-	return err
-}
-
-//go:embed all:frontend/wailsjs
-var Wailsjs embed.FS
-
-func CmdWailsjs(ctx *cli.Context) error {
-	targetDir := "./wailsjs"
-	if ctx.Args().Get(0) != "" {
-		targetDir = ctx.Args().Get(0)
-	}
-	return fs.WalkDir(Wailsjs, "frontend/wailsjs", func(path string, d fs.DirEntry, err error) error {
-		if err != nil {
-			return err
-		}
-		if path == "frontend/wailsjs" {
-			return nil
-		}
-		targetPath := filepath.Join(targetDir, strings.TrimPrefix(path, "frontend/wailsjs/"))
-		if d.IsDir() {
-			return os.MkdirAll(targetPath, os.ModePerm)
-		}
-
-		data, err := Wailsjs.ReadFile(path)
-		if err != nil {
-			return err
-		}
-
-		return os.WriteFile(targetPath, data, 0644)
+	app.NewWebviewWindowWithOptions(application.WebviewWindowOptions{
+		Frameless: true,
+		Title:     "html-greet",
 	})
+	return app.Run()
 }
