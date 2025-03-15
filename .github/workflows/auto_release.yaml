@@ -14,17 +14,34 @@ jobs:
         steps:
             - name: Checkout repository
               uses: actions/checkout@v4
+
+            - name: Download frontend
+              run: |
+                  wget https://github.com/HumXC/html-greet-frontend/releases/download/latest/html-greet-frontend.tar.gz
+                  mkdir frontend
+                  tar -xf html-greet-frontend.tar.gz -C frontend
+
             - uses: awalsh128/cache-apt-pkgs-action@latest
               with:
                   packages: libgtk-3-dev libwebkit2gtk-4.1-dev build-essential pkg-config
                   version: 1.0
-            - name: Install Wails
-              run: |
-                  go install github.com/wailsapp/wails/v3/cmd/wails@latest
-                  echo "$HOME/go/bin" >> $GITHUB_PATH
+
+            # - name: Install Wails
+            #   run: |
+            #       go install github.com/wailsapp/wails/v3/cmd/wails@latest
+            #       echo "$HOME/go/bin" >> $GITHUB_PATH
+
             - name: Build Project
               run: |
-                  ./build.sh
+                  go build
+
+            - name: Delete Old Releases
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                  tags="latest"
+                  echo "$tags" | xargs --no-run-if-empty -I {} gh release delete {} --yes
+                  echo "$tags" | xargs --no-run-if-empty -I {} gh api --method DELETE /repos/${{ github.repository }}/git/refs/tags/{}
 
             - name: Get Latest Commit Hash
               id: commit
@@ -40,11 +57,3 @@ jobs:
                   draft: false
                   prerelease: false
                   files: html-greet
-
-            - name: Delete Old Releases
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              run: |
-                  tags=$(gh release list --json tagName --jq '.[].tagName' | grep -v latest | tail -n +4)
-                  echo "$tags" | xargs --no-run-if-empty -I {} gh release delete {} --yes
-                  echo "$tags" | xargs --no-run-if-empty -I {} gh api --method DELETE /repos/${{ github.repository }}/git/refs/tags/{}

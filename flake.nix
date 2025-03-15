@@ -16,10 +16,10 @@
     ];
   in
     {
-      lib = import ./nix/lib;
+      lib = import ./nix/lib nixpkgs;
     }
     // {
-      overlays = import ./nix/overlays.nix {inherit nixpkgs;};
+      overlays = import ./nix/overlays.nix {inherit nixpkgs html-greet-frontend;};
       packages = forAllSystems (system: import ./nix/pkgs.nix {inherit nixpkgs system html-greet-frontend;});
       devShells = forAllSystems (system: import ./nix/devshell.nix {inherit nixpkgs system;});
     };

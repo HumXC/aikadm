@@ -5,8 +5,7 @@
 }: {
   default = final: _prev: let
     packages = import ./pkgs.nix {
-      inherit nixpkgs;
-      frontend = html-greet-frontend.packages.${final.system}.default;
+      inherit nixpkgs html-greet-frontend;
       system = final.system;
     };
   in {

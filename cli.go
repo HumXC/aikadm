@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 	"strings"
@@ -36,9 +37,16 @@ func NewCli() *cli.App {
 
 }
 func CmdMain(ctx *cli.Context) error {
-	if sock := os.Getenv("GREETD_SOCK"); sock != "" {
-		cmd := exec.Command("cage", "-s", "--", strings.Join(os.Args, " "))
-		return cmd.Run()
+	if os.Getenv("GREETD_SOCK") != "" && os.Getenv("HTML_GREET_USE_CAGE") == "" {
+		os.Setenv("HTML_GREET_USE_CAGE", "1")
+		exe, _ := os.Executable()
+		args := append([]string{"-s", "--", exe}, os.Args[1:]...)
+		cmd := exec.Command("cage", args...)
+		out, err := cmd.CombinedOutput()
+		if err != nil {
+			return fmt.Errorf("failed to run [%s]: %s", strings.Join(cmd.Args, " "), string(out))
+		}
+		return nil
 	}
 	if os.Getenv("XDG_SESSION_TYPE") == "wayland" {
 		os.Setenv("GDK_BACKEND", "wayland")

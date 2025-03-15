@@ -8,7 +8,7 @@
   gsettings-desktop-schemas,
   gtk3,
   webkitgtk_4_1,
-  wails3,
+  cage,
   debug ? false,
 }:
 buildGoModule {
@@ -18,7 +18,7 @@ buildGoModule {
   src = ./..;
 
   vendorHash = "sha256-xP5qMj5H81n6JYZdyN6k0OdGHpDHCin/h1iNL4/KOuk=";
-  nativeBuildInputs = [makeWrapper pkg-config wails3];
+  nativeBuildInputs = [makeWrapper pkg-config];
   proxyVendor = true;
   allowGoReference = true;
   buildInputs = [webkitgtk_4_1];
@@ -35,13 +35,11 @@ buildGoModule {
   preBuild = ''
     mkdir frontend
     cp -r ${frontend}/share/html-greet-frontend/* frontend/
-    wails3 generate bindings
-  '';
-  postBuild = ''
   '';
   # https://wails.io/docs/guides/nixos-font/
   postFixup = ''
     wrapProgram $out/bin/html-greet \
+      --prefix PATH : "${cage}/bin" \
       --set XDG_DATA_DIRS ${gsettings-desktop-schemas}/share/gsettings-schemas/${gsettings-desktop-schemas.name}:${gtk3}/share/gsettings-schemas/${gtk3.name}:$XDG_DATA_DIRS \
       --set GIO_MODULE_DIR ${glib-networking}/lib/gio/modules/
   '';

@@ -3,6 +3,9 @@
 > [!WARNING]
 > 该项目还在开发中！功能尚不稳定！请小心每一次更新！
 
+> [!WARNING]
+> Xorg 目前使用 startx 命令启动，支持尚不完善
+
 html-greet 是一个运行在 Linux 系统上的 Display Manager（登录管理器）。基于 [Wails](https://github.com/wailsapp/wails) 构建，借助 [Greetd](https://sr.ht/~kennylevinsen/greetd/) 实现用户登陆。
 
 受 [Web-Greeter](https://github.com/JezerM/web-greeter) 启发，html-greet 旨在提供一个简单地方式实现登陆管理器，用户可以使用 web 技术轻松定制自己的登录界面。
@@ -31,14 +34,12 @@ html-greet 是一个运行在 Linux 系统上的 Display Manager（登录管理�
      config,
      ...
     }: let
-      # argv 是提供给 html-greet 的命令行参数，详情查看 nix/lib/parse-argv.nix
+      # argv 是提供给 html-greet 的命令行参数，详情查看 nix/lib/default.nix
       argv = {
-        inherit pkgs;
-        html-greet = pkgs.html-greet.default;
+        html-greet = pkgs.html-greet;
         sessionDir = [config.services.displayManager.sessionData.desktops.out];
-        assets = "${pkgs.html-greet.frontend}/share/html-greet-frontend";
       };
-      cmd = "${inputs.html-greet.lib.cage-script argv}";
+      cmd = "${inputs.html-greet.lib.cmdWithArgs args}";
     in {
      config =  {
          nixpkgs.overlays = [ inputs.html-greet.overlays.default ];
@@ -51,26 +52,39 @@ html-greet 是一个运行在 Linux 系统上的 Display Manager（登录管理�
     }
     ```
 
-在 pkgs.nix 中，html-greet.frontend 是一个前端，仓库在 [frontend](https://github.com/HumXC/html-greet-frontend)。
-如果不指定 assets，则默认使用该仓库的 index.html。
-
 ### 其他发行版用户
+
+你可以直接从 [Release](https://github.com/HumXC/html-greet/releases/tag/latest) 页面下载最新的自动构建
 
 #### 构建
 
 1. 安装 Go 语言环境
-2. 克隆此仓库到本地
+2. 安装 wails3
+
+    ```bash
+    go install github.com/wailsapp/wails/v3/cmd/wails3@latest
+    ```
+
+3. 克隆此仓库到本地
    `git clone https://github.com/HumXC/html-greet.git`
-3. 进入仓库目录
+4. 进入仓库目录
    `cd html-greet`
-4. 构建项目
-   `./build.sh`
-   构建完成后，目录下生成可执行文件 `html-greet`。
+5. 下载前端文件并解压到 frontend 文件夹中，此处使用 [html-greet-frontend](https://github.com/HumXC/html-greet-frontend) 前端。然后执行 `go build`
+
+    ```bash
+    wget https://github.com/HumXC/html-greet-frontend/releases/download/latest/   html-greet-frontend.tar.gz
+    mkdir frontend
+    tar -xf ./html-greet-frontend.tar.gz -C frontend
+    go build
+    ```
+
+构建完成后，目录下生成可执行文件 `html-greet`。
 
 #### 使用
 
 0. 依赖:
 
+    - cage
     - webkit2gtk
 
 1. 你应该首先了解 [Greetd](https://sr.ht/~kennylevinsen/greetd/) 的使用方法。请查看 Greetd 的官方文档或查看 [Greetd Archwiki](https://wiki.archlinux.org/title/Greetd)。
@@ -78,7 +92,10 @@ html-greet 是一个运行在 Linux 系统上的 Display Manager（登录管理�
 
 你可以在桌面环境下直接运行 `html-greet` 预览其效果，但是如果你不使用 `-a` 参数，你只会看到一个丑陋的登陆界面。我还准备了一个前端，在 [html-greet-frontend](https://github.com/HumXC/html-greet-frontend)，你可以先构建这个前端或者编写你自己的前端，再使用 `html-greet -a <path-to-frontend>` 启动。-a 参数也可以是一个 url，例如 `html-greet -a https://humxc.github.io/html-greet-frontend/` 这在调试前端时非常有用，你也可以用于在线预览可用的前端。
 
-跟其他大部分 greetd 的 dm 一样，html-greet 需要一个混成器来显示画面。例如 cage, sway, hyprland 等。在这里我推荐使用 [Cage](https://github.com/cage-kiosk/cage)，因为 cage 足够简单，非常适合这种场景。
+> [!WARNING]
+> 请勿调用不可信的前端！
+
+跟其他大部分 greetd 的 dm 一样，html-greet 需要一个混成器来显示画面。例如 cage, sway, hyprland 等。html-greet 使用了 [Cage](https://github.com/cage-kiosk/cage)，因为 cage 足够简单，非常适合这种场景。html-greet 会自动调用 cage，请确保系统中安装了 cage
 
 ##### 配置 Greetd
 
@@ -86,7 +103,7 @@ html-greet 是一个运行在 Linux 系统上的 Display Manager（登录管理�
 
 ```toml
 [default_session]
-command = "cage -s -- html-greet -a /path/to/html-greet-frontend"
+command = "html-greet" # 或者 html-greet -a /path/to/html-greet-frontend
 user = "greeter"
 
 [terminal]
@@ -97,9 +114,9 @@ html-greet 会默认搜索 `/usr/share/xsessions` 和 `/usr/share/wayland-sessio
 
 ## 前端
 
-html-greet 自带了一个前端，就在 [index.html](https://github.com/HumXC/html-greet/blob/main/index.html) 中。关于如何编写前端，与 html-greet 相关的部分你可以运行 `html-greet wailsjs` 命令，这会在当前目录下输出 wailsjs 文件夹，这是由 Wails 生成的。你可以在前端项目中导入 wailsjs 中的代码，其中有用于实现登陆管理器功能的关键函数。
+TODO:
 
-你可以查看 [html-greet-frontend](https://github.com/HumXC/html-greet-frontend/blob/main/src/components/LoginScreen.vue#L162) 了解如何使用 wailsjs 中的代码。
+你可以查看 [html-greet-frontend](https://github.com/HumXC/html-greet-frontend/blob/main/src/components/LoginScreen.vue#L162) 了解如何编写前端。
 
 [预览 html-greet-frontend](https://humxc.github.io/html-greet-frontend/)
 

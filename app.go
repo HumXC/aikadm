@@ -75,6 +75,7 @@ func (a *HtmlGreet) Login(username, password, session string) error {
 		if s.Name == session {
 			cmd := []string{s.Exec}
 			env := a.env
+			// FIXME
 			if s.SessionType == "xorg" {
 				cmd = []string{fmt.Sprintf("startx %s", s.Exec)}
 			}
