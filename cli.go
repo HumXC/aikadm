@@ -1,13 +1,21 @@
 package main
 
+/*
+#cgo linux pkg-config: gtk+-3.0
+#include <gtk/gtk.h>
+*/
+import "C"
 import (
 	"fmt"
 	"os"
 	"os/exec"
+	"reflect"
 	"strings"
+	"unsafe"
 
 	"github.com/urfave/cli/v2"
 	"github.com/wailsapp/wails/v3/pkg/application"
+	"github.com/wailsapp/wails/v3/pkg/events"
 )
 
 func NewCli() *cli.App {
@@ -75,9 +83,17 @@ func CmdMain(ctx *cli.Context) error {
 			application.NewService(NewApp(sessionDir, env)),
 		},
 	})
-	app.NewWebviewWindowWithOptions(application.WebviewWindowOptions{
-		Frameless: true,
-		Title:     "html-greet",
+	app.OnApplicationEvent(events.Common.ApplicationStarted, func(event *application.ApplicationEvent) {
+		window := app.NewWebviewWindowWithOptions(application.WebviewWindowOptions{
+			Frameless: true,
+			Title:     "html-greet",
+			MaxWidth:  0,
+			MaxHeight: 0,
+		})
+		_window := reflect.ValueOf(window).Elem()
+		gtkWindowPtr := _window.FieldByName("impl").Elem().Elem().FieldByName("window")
+		gtkWindow := (*C.GtkWindow)(unsafe.Pointer(gtkWindowPtr.Pointer()))
+		C.gtk_window_set_geometry_hints(gtkWindow, nil, nil, 0)
 	})
 	return app.Run()
 }
