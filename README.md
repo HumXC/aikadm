@@ -84,13 +84,17 @@ aikadm 是一个运行在 Linux 系统上的 Display Manager（登录管理器�
 
 0. 依赖:
 
+    - greetd
     - cage
     - webkit2gtk
 
-1. 你应该首先了解 [Greetd](https://sr.ht/~kennylevinsen/greetd/) 的使用方法。请查看 Greetd 的官方文档或查看 [Greetd Archwiki](https://wiki.archlinux.org/title/Greetd)。
-2. 关于 aikadm 的使用，请查看 `aikadm -h`
+1. 关于 aikadm 的使用，请运行 `aikadm -h`
 
-你可以在桌面环境下直接运行 `aikadm` 预览其效果，但是如果你不使用 `-a` 参数，你只会看到一个丑陋的登陆界面。我还准备了一个前端，在 [aikadm-frontend](https://github.com/HumXC/aikadm-frontend)，你可以先构建这个前端或者编写你自己的前端，再使用 `aikadm -a <path-to-frontend>` 启动。-a 参数也可以是一个 url，例如 `aikadm -a https://humxc.github.io/aikadm-frontend/` 这在调试前端时非常有用，你也可以用于在线预览可用的前端。
+2. Assets
+   你可以在桌面环境下直接运行 `aikadm` 预览其效果，但是如果你不使用 `-a` 参数，你只会看到一个丑陋的登陆界面。我还准备了一个前端，在 [aikadm-frontend](https://github.com/HumXC/aikadm-frontend)，你可以先构建这个前端或者编写你自己的前端，再使用 `aikadm -a <path-to-frontend>` 启动。-a 参数也可以是一个 url，例如 `aikadm -a https://humxc.github.io/aikadm-frontend/` 这在调试前端时非常有用，你也可以用于在线预览可用的前端。
+
+3. SessionDir
+   aikadm 会默认搜索 `/usr/share/xsessions` 和 `/usr/share/wayland-sessions` 中的 `.desktop` 文件，并通过 xsessions 和 wayland-sessions 目录来判断一个 session 是 Xorg 还是 Wayland。如果你 aikadm 找不到任何一个 session，你可能需要检查这两个文件夹。你也可以通过 -d 参数指定 session 搜索的目录。
 
 > [!WARNING]
 > 请勿调用不可信的前端！
@@ -99,7 +103,7 @@ aikadm 是一个运行在 Linux 系统上的 Display Manager（登录管理器�
 
 ##### 配置 Greetd
 
-通过查阅 Greetd 的文档，你应该已经知道如何配置 Greetd，以下是一个配置的示例
+通过查阅 Greetd 的文档，你应该已经知道如何配置 Greetd，以下是 Greetd 配置的示例
 
 ```toml
 [default_session]
@@ -110,13 +114,13 @@ user = "greeter"
 vt = 1
 ```
 
-aikadm 会默认搜索 `/usr/share/xsessions` 和 `/usr/share/wayland-sessions` 中的 `.desktop` 文件，并通过 xsessions 和 wayland-sessions 目录来判断一个 session 是 Xorg 还是 Wayland。如果你 aikadm 找不到任何一个 session，你可能需要检查这两个文件夹。你也可以通过 -d 参数指定 session 搜索的目录。
+关于 [Greetd](https://sr.ht/~kennylevinsen/greetd/) 的更多内容。请查看 Greetd 的官方文档或查看 [Greetd Archwiki](https://wiki.archlinux.org/title/Greetd)。
 
 ## 前端
 
 TODO:
 
-你可以查看 [aikadm-frontend](https://github.com/HumXC/aikadm-frontend/blob/main/src/components/LoginScreen.vue#L162) 了解如何编写前端。
+你可以查看 [aikadm-frontend](https://github.com/HumXC/aikadm-frontend/blob/main/src/views/LoginScreen.vue#L162) 了解如何编写前端。
 
 [预览 aikadm-frontend](https://humxc.github.io/aikadm-frontend/)
 
