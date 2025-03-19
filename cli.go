@@ -20,7 +20,7 @@ import (
 
 func NewCli() *cli.App {
 	return &cli.App{
-		Name:   "html-greet",
+		Name:   "aikadm",
 		Action: CmdMain,
 		Flags: []cli.Flag{
 			&cli.StringSliceFlag{
@@ -75,7 +75,7 @@ func CmdMain(ctx *cli.Context) error {
 	}
 
 	app := application.New(application.Options{
-		Name: "html-greet",
+		Name: "aikadm",
 		Assets: application.AssetOptions{
 			Handler: NewAssetServer(ctx.String("assets")),
 		},
@@ -86,7 +86,7 @@ func CmdMain(ctx *cli.Context) error {
 	app.OnApplicationEvent(events.Common.ApplicationStarted, func(event *application.ApplicationEvent) {
 		window := app.NewWebviewWindowWithOptions(application.WebviewWindowOptions{
 			Frameless: true,
-			Title:     "html-greet",
+			Title:     "aikadm",
 			MaxWidth:  0,
 			MaxHeight: 0,
 		})

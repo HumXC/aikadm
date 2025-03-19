@@ -1,4 +1,4 @@
-module github.com/HumXC/html-greet
+module github.com/HumXC/aikadm
 
 go 1.23.0
 

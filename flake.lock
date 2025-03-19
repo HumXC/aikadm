@@ -1,6 +1,6 @@
 {
   "nodes": {
-    "html-greet-frontend": {
+    "aikadm-frontend": {
       "inputs": {
         "nixpkgs": [
           "nixpkgs"
@@ -10,13 +10,13 @@
         "lastModified": 1742041418,
         "narHash": "sha256-zLZYFzKEjzEv05UUml+SHPX2q5I6o+Hq4keEXtVDK2k=",
         "owner": "HumXC",
-        "repo": "html-greet-frontend",
+        "repo": "aikadm-frontend",
         "rev": "0f6bce95a73f3abe376a439045d337b5c2a67040",
         "type": "github"
       },
       "original": {
         "owner": "HumXC",
-        "repo": "html-greet-frontend",
+        "repo": "aikadm-frontend",
         "type": "github"
       }
     },
@@ -38,7 +38,7 @@
     },
     "root": {
       "inputs": {
-        "html-greet-frontend": "html-greet-frontend",
+        "aikadm-frontend": "aikadm-frontend",
         "nixpkgs": "nixpkgs"
       }
     }

@@ -16,13 +16,13 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/HumXC/html-greet/greetd"
+	"github.com/HumXC/aikadm/greetd"
 	"github.com/godbus/dbus/v5"
 	"github.com/rkoesters/xdg/desktop"
 	"github.com/rkoesters/xdg/keyfile"
 )
 
-type IHtmlGreet interface {
+type IAikadm interface {
 	startup(ctx context.Context)
 	Login(username, password, session string) error
 	GetSessions() ([]SessionEntry, error)
@@ -33,7 +33,7 @@ type IHtmlGreet interface {
 	ReadConfig() (any, error)
 	SaveConfig(config any) error
 }
-type HtmlGreet struct {
+type Aikadm struct {
 	ctx        context.Context
 	env        []string
 	sessionDir []string
@@ -42,13 +42,13 @@ type HtmlGreet struct {
 	mookApp    *MookApp
 }
 
-var _ IHtmlGreet = (*HtmlGreet)(nil)
+var _ IAikadm = (*Aikadm)(nil)
 
-func NewApp(sessionDir, env []string) *HtmlGreet {
-	app := &HtmlGreet{
+func NewApp(sessionDir, env []string) *Aikadm {
+	app := &Aikadm{
 		sessionDir: sessionDir,
 		env:        env,
-		logger:     log.New(os.Stdout, "html-greet: ", log.LstdFlags),
+		logger:     log.New(os.Stdout, "aikadm: ", log.LstdFlags),
 		mookApp: &MookApp{
 			sessionDir: sessionDir,
 			env:        env,
@@ -59,11 +59,11 @@ func NewApp(sessionDir, env []string) *HtmlGreet {
 	}
 	return app
 }
-func (a *HtmlGreet) startup(ctx context.Context) {
+func (a *Aikadm) startup(ctx context.Context) {
 	a.ctx = ctx
 	a.mookApp.startup(ctx)
 }
-func (a *HtmlGreet) Login(username, password, session string) error {
+func (a *Aikadm) Login(username, password, session string) error {
 	if a.dev {
 		return a.mookApp.Login(username, password, session)
 	}
@@ -91,7 +91,7 @@ type SessionEntry struct {
 	SessionType string
 }
 
-func (a *HtmlGreet) GetSessions() ([]SessionEntry, error) {
+func (a *Aikadm) GetSessions() ([]SessionEntry, error) {
 	result := []SessionEntry{}
 	for _, dir := range a.sessionDir {
 		err := filepath.WalkDir(dir, func(path string, d fs.DirEntry, err error) error {
@@ -143,7 +143,7 @@ func (a *HtmlGreet) GetSessions() ([]SessionEntry, error) {
 	}
 	return result, nil
 }
-func (a *HtmlGreet) GetUsers() ([]user.User, error) {
+func (a *Aikadm) GetUsers() ([]user.User, error) {
 	result := []user.User{}
 	for i := 1000; i < 60000; i++ {
 		user, err := user.LookupId(strconv.Itoa(i))
@@ -154,7 +154,7 @@ func (a *HtmlGreet) GetUsers() ([]user.User, error) {
 	}
 	return result, nil
 }
-func (a *HtmlGreet) GetUserAvatar(username string) (string, error) {
+func (a *Aikadm) GetUserAvatar(username string) (string, error) {
 	user, err := user.Lookup(username)
 	if err != nil {
 		return "", err
@@ -178,7 +178,7 @@ func (a *HtmlGreet) GetUserAvatar(username string) (string, error) {
 	}
 	return "", fmt.Errorf("no avatar found for user %s", username)
 }
-func (a *HtmlGreet) Shutdown() error {
+func (a *Aikadm) Shutdown() error {
 	if a.dev {
 		return a.mookApp.Shutdown()
 	}
@@ -191,7 +191,7 @@ func (a *HtmlGreet) Shutdown() error {
 	return call.Err
 }
 
-func (a *HtmlGreet) Reboot() error {
+func (a *Aikadm) Reboot() error {
 	if a.dev {
 		return a.mookApp.Reboot()
 	}
@@ -204,9 +204,9 @@ func (a *HtmlGreet) Reboot() error {
 	return call.Err
 }
 
-const ConfigPath = "/var/tmp/html-greet-config.json"
+const ConfigPath = "/var/tmp/aikadm-config.json"
 
-func (a *HtmlGreet) ReadConfig() (any, error) {
+func (a *Aikadm) ReadConfig() (any, error) {
 	if _, err := os.Stat(ConfigPath); os.IsNotExist(err) {
 		return nil, fmt.Errorf("config file not found: %s", ConfigPath)
 	}
@@ -223,7 +223,7 @@ func (a *HtmlGreet) ReadConfig() (any, error) {
 	}
 	return config, nil
 }
-func (a *HtmlGreet) SaveConfig(config any) error {
+func (a *Aikadm) SaveConfig(config any) error {
 	f, err := os.Create(ConfigPath)
 	if err != nil {
 		return err
@@ -237,12 +237,12 @@ func (a *HtmlGreet) SaveConfig(config any) error {
 	return nil
 }
 
-func (a *HtmlGreet) exec(command []string) *exec.Cmd {
+func (a *Aikadm) exec(command []string) *exec.Cmd {
 	cmd := exec.Command(command[0], command[1:]...)
 	a.logger.Printf("executed command: [%s]", strings.Join(cmd.Args, " "))
 	return cmd
 }
-func (a *HtmlGreet) Exec(command []string) (int, error) {
+func (a *Aikadm) Exec(command []string) (int, error) {
 	cmd := a.exec(command)
 	err := cmd.Start()
 	if err != nil {
@@ -250,7 +250,7 @@ func (a *HtmlGreet) Exec(command []string) (int, error) {
 	}
 	return cmd.Process.Pid, nil
 }
-func (a *HtmlGreet) KillProcess(pid int) error {
+func (a *Aikadm) KillProcess(pid int) error {
 	process, err := os.FindProcess(pid)
 	if err != nil {
 		return err
@@ -261,7 +261,7 @@ func (a *HtmlGreet) KillProcess(pid int) error {
 	}
 	return nil
 }
-func (a *HtmlGreet) ExecOutput(command []string) (result string, err error) {
+func (a *Aikadm) ExecOutput(command []string) (result string, err error) {
 	cmd := a.exec(command)
 	output, err := cmd.CombinedOutput()
 	if err != nil {

@@ -1,14 +1,14 @@
 {
   nixpkgs,
-  html-greet-frontend,
+  aikadm-frontend,
   ...
 }: {
   default = final: _prev: let
     packages = import ./pkgs.nix {
-      inherit nixpkgs html-greet-frontend;
+      inherit nixpkgs aikadm-frontend;
       system = final.system;
     };
   in {
-    html-greet = packages.default;
+    aikadm = packages.default;
   };
 }

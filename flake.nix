@@ -1,13 +1,13 @@
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    html-greet-frontend.url = "github:HumXC/html-greet-frontend";
-    html-greet-frontend.inputs.nixpkgs.follows = "nixpkgs";
+    aikadm-frontend.url = "github:HumXC/aikadm-frontend";
+    aikadm-frontend.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs = {
     nixpkgs,
-    html-greet-frontend,
+    aikadm-frontend,
     ...
   }: let
     forAllSystems = nixpkgs.lib.genAttrs [
@@ -19,8 +19,8 @@
       lib = import ./nix/lib nixpkgs;
     }
     // {
-      overlays = import ./nix/overlays.nix {inherit nixpkgs html-greet-frontend;};
-      packages = forAllSystems (system: import ./nix/pkgs.nix {inherit nixpkgs system html-greet-frontend;});
+      overlays = import ./nix/overlays.nix {inherit nixpkgs aikadm-frontend;};
+      packages = forAllSystems (system: import ./nix/pkgs.nix {inherit nixpkgs system aikadm-frontend;});
       devShells = forAllSystems (system: import ./nix/devshell.nix {inherit nixpkgs system;});
     };
   nixConfig = {

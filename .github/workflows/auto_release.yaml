@@ -17,9 +17,9 @@ jobs:
 
             - name: Download frontend
               run: |
-                  wget https://github.com/HumXC/html-greet-frontend/releases/download/latest/html-greet-frontend.tar.gz
+                  wget https://github.com/HumXC/aikadm-frontend/releases/download/latest/aikadm-frontend.tar.gz
                   mkdir frontend
-                  tar -xf html-greet-frontend.tar.gz -C frontend
+                  tar -xf aikadm-frontend.tar.gz -C frontend
 
             - uses: awalsh128/cache-apt-pkgs-action@latest
               with:
@@ -56,4 +56,4 @@ jobs:
                   body: "自动发布于 commit: ${{ env.sha_short }}"
                   draft: false
                   prerelease: false
-                  files: html-greet
+                  files: aikadm
