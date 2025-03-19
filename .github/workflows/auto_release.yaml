@@ -39,7 +39,7 @@ jobs:
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               run: |
-                  tags="latest"
+                  tags=$(gh release list --json tagName --jq '.[].tagName' | grep latest)
                   echo "$tags" | xargs --no-run-if-empty -I {} gh release delete {} --yes
                   echo "$tags" | xargs --no-run-if-empty -I {} gh api --method DELETE /repos/${{ github.repository }}/git/refs/tags/{}
 
