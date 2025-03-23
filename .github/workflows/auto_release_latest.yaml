@@ -1,0 +1,54 @@
+name: Auto Build And Release
+
+on:
+    push:
+        branches:
+            - main
+
+jobs:
+    build-and-release:
+        runs-on: ubuntu-22.04
+        permissions:
+            contents: write
+            id-token: write
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - name: Download frontend
+              run: |
+                  wget https://github.com/HumXC/aikadm-frontend/releases/download/latest/aikadm-frontend.tar.gz
+                  mkdir frontend
+                  tar -xf aikadm-frontend.tar.gz -C frontend
+
+            - uses: awalsh128/cache-apt-pkgs-action@latest
+              with:
+                  packages: libgtk-3-dev libwebkit2gtk-4.1-dev build-essential pkg-config
+                  version: 1.0
+
+            - name: Build Project
+              run: |
+                  go build
+
+            - name: Delete Old Releases
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                  tags=$(gh release list --json tagName --jq '.[].tagName' | grep latest)
+                  echo "$tags" | xargs --no-run-if-empty -I {} gh release delete {} --yes
+                  echo "$tags" | xargs --no-run-if-empty -I {} gh api --method DELETE /repos/${{ github.repository }}/git/refs/tags/{}
+
+            - name: Get Latest Commit Hash
+              id: commit
+              run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+
+            - name: Create GitHub Release
+              uses: softprops/action-gh-release@v2
+              with:
+                  token: ${{ secrets.GITHUB_TOKEN }}
+                  tag_name: latest
+                  name: "Latest Release (${{ env.sha_short }})"
+                  body: "自动发布于 commit: ${{ env.sha_short }}"
+                  draft: false
+                  prerelease: false
+                  files: aikadm

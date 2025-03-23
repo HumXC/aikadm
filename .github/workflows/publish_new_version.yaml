@@ -1,8 +1,7 @@
-name: Auto Build And Release
+name: Publish New Version
 
 on:
     push:
-        branches: [main]
         tags: ["v*"]
 
 jobs:
@@ -32,15 +31,6 @@ jobs:
               run: |
                   go build
 
-            - name: Delete Old Latest Release
-              if: github.ref == 'refs/heads/main'
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              run: |
-                  tags=$(gh release list --json tagName --jq '.[].tagName' | grep latest)
-                  echo "$tags" | xargs --no-run-if-empty -I {} gh release delete {} --yes
-                  echo "$tags" | xargs --no-run-if-empty -I {} gh api --method DELETE /repos/${{ github.repository }}/git/refs/tags/{}
-
             - name: Get Version Info
               id: version
               run: |
@@ -49,15 +39,11 @@ jobs:
                     TAG_NAME=${GITHUB_REF#refs/tags/}
                     if [[ $TAG_NAME =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[a-z]+\.?[0-9]*)?$ ]]; then
                       echo "RELEASE_TAG=$TAG_NAME" >> $GITHUB_ENV
-                      echo "RELEASE_NAME=Version $TAG_NAME" >> $GITHUB_ENV
+                      echo "RELEASE_NAME=$TAG_NAME" >> $GITHUB_ENV
                     else
                       echo "::error::Tag format invalid, must be vX.Y.Z or vX.Y.Z-rc.n"
                       exit 1
                     fi
-                  else
-                    # 普通提交生成 latest
-                    echo "RELEASE_TAG=latest" >> $GITHUB_ENV
-                    echo "RELEASE_NAME=Latest ($(git rev-parse --short HEAD))" >> $GITHUB_ENV
                   fi
 
             - name: Create GitHub Release
