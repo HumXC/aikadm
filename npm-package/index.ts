@@ -1,4 +1,4 @@
-import * as Aikadm_ from "./bindings/github.com/HumXC/aikadm/aikadm.js";
+import * as Aikadm_ from "./bindings/github.com/HumXC/aikadm/aikadm";
 import * as DemoAikadm from "./demo";
 // The demo mode is triggered when the GREETD_SOCK environment variable is not set or the wails backend cannot be connected to.
 export let IsDemoMode = false;

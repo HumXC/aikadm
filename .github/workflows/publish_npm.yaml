@@ -30,12 +30,13 @@ jobs:
 
             - name: Generate Bindings
               run: |
-                  wails3 generate bindings -d npm-package/bindings
+                  wails3 generate bindings -ts -d npm-package/bindings
 
             - name: Publish Package
               run: |
                   cd npm-package
-                  npm run build
-                  npm publish --provenance --access public
+                  chmod +x build.sh
+                  ./build.sh
+                  npm publish --provenance --access public ./dist
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

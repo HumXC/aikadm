@@ -1,5 +1,5 @@
-import { SessionEntry } from "./bindings/github.com/HumXC/aikadm/models.js";
-import { User } from "./bindings/os/user/models.js";
+import { SessionEntry } from "./bindings/github.com/HumXC/aikadm/models";
+import { User } from "./bindings/os/user/models";
 let config_: any = {};
 
 function Wrap<T extends (...args: any[]) => any>(

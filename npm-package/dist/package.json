@@ -1,11 +1,8 @@
 {
     "name": "@aikadm/aikadm",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "description": "Aikadm frontend library",
     "main": "index.js",
-    "scripts": {
-        "build": "tsc -t es2022 -m es2022 --declaration --emitDeclarationOnly --allowJs --checkJs index.ts"
-    },
     "repository": {
         "type": "git",
         "url": "git+https://github.com/HumXC/aikadm.git"
