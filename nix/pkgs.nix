@@ -5,10 +5,12 @@
   ...
 }: let
   pkgs = import nixpkgs {inherit system;};
+  lib = import ./nix/lib nixpkgs;
   frontend = aikadm-frontend.packages.${system}.default;
   wails3 = pkgs.callPackage ./wails3.nix {};
   aikadm = pkgs.callPackage ./package.nix {inherit frontend;};
+  cmdWithArgs = args: lib.cmdWithArgs ({inherit aikadm;} // args);
 in {
   default = aikadm;
-  wails3 = wails3;
+  inherit cmdWithArgs wails3;
 }

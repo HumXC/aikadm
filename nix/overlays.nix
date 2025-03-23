@@ -9,6 +9,6 @@
       system = final.system;
     };
   in {
-    aikadm = packages.default;
+    aikadm = packages;
   };
 }

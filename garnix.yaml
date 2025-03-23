@@ -1,4 +1,5 @@
 builds:
     include:
-        - packages.x86_64-linux.*
-        - devShell.x86_64-linux.default
+        - packages.*.defautl
+        - packages.*.wails3
+        - devShell.*.default
