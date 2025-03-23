@@ -22,26 +22,19 @@ buildGoModule {
   proxyVendor = true;
   allowGoReference = true;
   buildInputs = [webkitgtk_4_1];
-  tags =
-    [
-      "desktop"
-      "production"
-    ]
-    ++ (lib.optional debug ["debug" "devtools"]);
-  ldflags = [
-    "-s"
-    "-w"
-  ];
+  tags = (lib.optional (!debug) ["desktop" "production"]);
+  ldflags = (lib.optional (!debug)  ["-s" "-w"]);
   preBuild = ''
     mkdir frontend
     cp -r ${frontend}/share/aikadm-frontend/* frontend/
   '';
   # https://wails.io/docs/guides/nixos-font/
+  # 设置 XDG_DATA_DIRS 会导致 devtools 异常
   postFixup = ''
     wrapProgram $out/bin/aikadm \
       --prefix PATH : "${cage}/bin" \
-      --set XDG_DATA_DIRS ${gsettings-desktop-schemas}/share/gsettings-schemas/${gsettings-desktop-schemas.name}:${gtk3}/share/gsettings-schemas/${gtk3.name}:$XDG_DATA_DIRS \
       --set GIO_MODULE_DIR ${glib-networking}/lib/gio/modules/
+      ${lib.optionalString (!debug) "--set XDG_DATA_DIRS ${gsettings-desktop-schemas}/share/gsettings-schemas/${gsettings-desktop-schemas.name}:${gtk3}/share/gsettings-schemas/${gtk3.name}:$XDG_DATA_DIRS \\"}
   '';
   meta = {
     description = "Build display manager using HTML + CSS + JS";

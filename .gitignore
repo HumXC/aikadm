@@ -9,4 +9,4 @@ npm-package/dist/*
 !npm-package/dist/package.json
 npm-package/*.d.ts
 npm-package/*.js
-/*.tgz
+*.tgz
