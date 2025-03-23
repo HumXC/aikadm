@@ -7,3 +7,4 @@ result
 npm-package/bindings
 npm-package/*.d.ts
 npm-package/*.js
+/*.tgz
