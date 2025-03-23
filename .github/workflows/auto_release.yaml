@@ -2,8 +2,8 @@ name: Auto Build And Release
 
 on:
     push:
-        branches:
-            - main
+        branches: [main]
+        tags: ["v*"]
 
 jobs:
     build-and-release:
@@ -14,6 +14,8 @@ jobs:
         steps:
             - name: Checkout repository
               uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
 
             - name: Download frontend
               run: |
@@ -30,7 +32,8 @@ jobs:
               run: |
                   go build
 
-            - name: Delete Old Releases
+            - name: Delete Old Latest Release
+              if: github.ref == 'refs/heads/main'
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               run: |
@@ -38,17 +41,36 @@ jobs:
                   echo "$tags" | xargs --no-run-if-empty -I {} gh release delete {} --yes
                   echo "$tags" | xargs --no-run-if-empty -I {} gh api --method DELETE /repos/${{ github.repository }}/git/refs/tags/{}
 
-            - name: Get Latest Commit Hash
-              id: commit
-              run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+            - name: Get Version Info
+              id: version
+              run: |
+                  if [[ $GITHUB_REF == refs/tags/* ]]; then
+                    # 提取 tag 并校验格式
+                    TAG_NAME=${GITHUB_REF#refs/tags/}
+                    if [[ $TAG_NAME =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[a-z]+\.?[0-9]*)?$ ]]; then
+                      echo "RELEASE_TAG=$TAG_NAME" >> $GITHUB_ENV
+                      echo "RELEASE_NAME=Version $TAG_NAME" >> $GITHUB_ENV
+                    else
+                      echo "::error::Tag format invalid, must be vX.Y.Z or vX.Y.Z-rc.n"
+                      exit 1
+                    fi
+                  else
+                    # 普通提交生成 latest
+                    echo "RELEASE_TAG=latest" >> $GITHUB_ENV
+                    echo "RELEASE_NAME=Latest ($(git rev-parse --short HEAD))" >> $GITHUB_ENV
+                  fi
 
             - name: Create GitHub Release
               uses: softprops/action-gh-release@v2
               with:
                   token: ${{ secrets.GITHUB_TOKEN }}
-                  tag_name: latest
-                  name: "Latest Release (${{ env.sha_short }})"
-                  body: "自动发布于 commit: ${{ env.sha_short }}"
+                  tag_name: ${{ env.RELEASE_TAG }}
+                  name: ${{ env.RELEASE_NAME }}
+                  body: |
+                      ${{ github.event.head_commit.message }}
+
+                      Commit SHA: ${{ github.sha }}
                   draft: false
-                  prerelease: false
-                  files: aikadm
+                  prerelease: ${{ contains(env.RELEASE_TAG, '-') }} # 包含连字符标记为预发布
+                  files: |
+                      aikadm
