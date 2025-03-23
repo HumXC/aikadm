@@ -1,0 +1,19 @@
+{
+    "name": "@aikadm/aikadm",
+    "version": "0.0.1",
+    "description": "Aikadm frontend library",
+    "main": "index.js",
+    "scripts": {
+        "generate-types": "tsc --declaration --allowJs --checkJs --emitDeclarationOnly -t es2023 index.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/HumXC/aikadm.git"
+    },
+    "author": "HumXC",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/HumXC/aikadm/issues"
+    },
+    "homepage": "https://github.com/HumXC/aikadm#readme"
+}

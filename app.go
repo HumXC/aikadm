@@ -75,9 +75,9 @@ func (a *Aikadm) Login(username, password, session string) error {
 		if s.Name == session {
 			cmd := []string{s.Exec}
 			env := a.env
-			// FIXME
 			if s.SessionType == "xorg" {
-				cmd = []string{fmt.Sprintf("startx %s", s.Exec)}
+				// https://github.com/apognu/tuigreet/blob/master/src/greeter.rs#L40
+				cmd = []string{fmt.Sprintf("startx /usr/bin/env %s", s.Exec)}
 			}
 			return greetd.Login(username, password, cmd, env)
 		}

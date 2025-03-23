@@ -3,9 +3,6 @@
 > [!WARNING]
 > 该项目还在开发中！功能尚不稳定！请小心每一次更新！
 
-> [!WARNING]
-> Xorg 目前使用 startx 命令启动，支持尚不完善
-
 aikadm 是一个运行在 Linux 系统上的 Display Manager（登录管理器）。基于 [Wails](https://github.com/wailsapp/wails) 构建，借助 [Greetd](https://sr.ht/~kennylevinsen/greetd/) 实现用户登陆。
 
 受 [Web-Greeter](https://github.com/JezerM/web-greeter) 启发，aikadm 旨在提供一个简单地方式实现登陆管理器，用户可以使用 web 技术轻松定制自己的登录界面。
@@ -93,13 +90,16 @@ aikadm 是一个运行在 Linux 系统上的 Display Manager（登录管理器�
 2. Assets
    你可以在桌面环境下直接运行 `aikadm` 预览其效果，但是如果你不使用 `-a` 参数，你只会看到一个丑陋的登陆界面。我还准备了一个前端，在 [aikadm-frontend](https://github.com/HumXC/aikadm-frontend)，你可以先构建这个前端或者编写你自己的前端，再使用 `aikadm -a <path-to-frontend>` 启动。-a 参数也可以是一个 url，例如 `aikadm -a https://humxc.github.io/aikadm-frontend/` 这在调试前端时非常有用，你也可以用于在线预览可用的前端。
 
+    > [!WARNING]
+    > 请勿调用不可信的前端！
+
 3. SessionDir
    aikadm 会默认搜索 `/usr/share/xsessions` 和 `/usr/share/wayland-sessions` 中的 `.desktop` 文件，并通过 xsessions 和 wayland-sessions 目录来判断一个 session 是 Xorg 还是 Wayland。如果你 aikadm 找不到任何一个 session，你可能需要检查这两个文件夹。你也可以通过 -d 参数指定 session 搜索的目录。
 
-> [!WARNING]
-> 请勿调用不可信的前端！
+4. Install Assets
+   你可以使用 `install` 子命令来安装一个前端。例如 `aikadm install https://github.com/HumXC/aikadm-frontend/releases/download/latest/aikadm-frontend.tar.gz` 会将下载的压缩文档解压到 Assets 目录下。
 
-跟其他大部分 greetd 的 dm 一样，aikadm 需要一个混成器来显示画面。例如 cage, sway, hyprland 等。aikadm 使用了 [Cage](https://github.com/cage-kiosk/cage)，因为 cage 足够简单，非常适合这种场景。aikadm 会自动调用 cage，请确保系统中安装了 cage
+跟其他大部分 greetd 的 dm 一样，aikadm 需要一个混成器来显示画面。例如 cage, sway, hyprland 等。aikadm 使用了 [Cage(https://github.com/cage-kiosk/cage)，因为 cage 足够简单，非常适合这种场景。aikadm 会自动调用 cage，请确保系统中装了 cage
 
 ##### 配置 Greetd
 
@@ -129,4 +129,5 @@ TODO:
 -   [Wails](https://github.com/wailsapp/wails)
 -   [Greetd](https://sr.ht/~kennylevinsen/greetd/)
 -   [Web-Greeter](https://github.com/JezerM/web-greeter)
+-   [Tuigreet](https://github.com/apognu/tuigreet/)
 -   [aikadm-frontend](https://github.com/HumXC/aikadm-frontend)

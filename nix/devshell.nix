@@ -9,6 +9,7 @@ in {
   default = pkgs.mkShell {
     buildInputs = with pkgs; [
       go
+      nodejs
       wails3
       gtk3
       webkitgtk_4_1

@@ -4,3 +4,5 @@
 frontend
 result
 /aikadm
+npm-package/bindings
+npm-package/*.d.ts

@@ -6,17 +6,24 @@ package main
 */
 import "C"
 import (
+	"errors"
 	"fmt"
+	"net/http"
+	"net/url"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"reflect"
 	"strings"
 	"unsafe"
 
+	"github.com/mholt/archiver/v3"
 	"github.com/urfave/cli/v2"
 	"github.com/wailsapp/wails/v3/pkg/application"
 	"github.com/wailsapp/wails/v3/pkg/events"
 )
+
+const DEFAULT_ASSETS_DIR = "/usr/share/aikadm"
 
 func NewCli() *cli.App {
 	return &cli.App{
@@ -37,8 +44,15 @@ func NewCli() *cli.App {
 			&cli.StringFlag{
 				Name:    "assets",
 				Aliases: []string{"a"},
-				Value:   "",
+				Value:   DEFAULT_ASSETS_DIR,
 				Usage:   "Set of assets to serve",
+			},
+		},
+		Commands: []*cli.Command{
+			{
+				Name:   "install",
+				Usage:  "Install frontend assets to the specified directory, which can be a compressed file, directory or a link to a compressed file. If directory is not exists, it will be created.",
+				Action: CmdInstall,
 			},
 		},
 	}
@@ -96,4 +110,78 @@ func CmdMain(ctx *cli.Context) error {
 		C.gtk_window_set_geometry_hints(gtkWindow, nil, nil, 0)
 	})
 	return app.Run()
+}
+
+func CmdInstall(ctx *cli.Context) error {
+	if ctx.Args().Len() != 1 {
+		return fmt.Errorf("invalid arguments")
+	}
+	src := ctx.Args().First()
+	if url, err := url.Parse(src); err == nil && url.Scheme != "" {
+		getFilenameFromHeader := func(resp *http.Response) string {
+			contentDisposition := resp.Header.Get("Content-Disposition")
+			if contentDisposition == "" {
+				return ""
+			}
+
+			parts := strings.Split(contentDisposition, ";")
+			for _, part := range parts {
+				part = strings.TrimSpace(part)
+				if strings.HasPrefix(part, "filename=") {
+					filename := strings.TrimPrefix(part, "filename=")
+					filename = strings.Trim(filename, `"`)
+					return filename
+				}
+			}
+			return ""
+		}
+		resp, err := http.DefaultClient.Get(src)
+		if err != nil {
+			return fmt.Errorf("failed to download: %s", err)
+		}
+
+		filename := getFilenameFromHeader(resp)
+
+		if filename == "" {
+			filename = filepath.Base(url.Path)
+		}
+		f, err := os.CreateTemp("", "aikadm-*"+filename)
+		if err != nil {
+			return fmt.Errorf("failed to create temporary file: %s", err)
+		}
+		defer os.Remove(f.Name())
+		_, err = f.ReadFrom(resp.Body)
+		f.Close()
+		if err != nil {
+			return fmt.Errorf("failed to write to temporary file: %s", err)
+		}
+		src = f.Name()
+	}
+	assets := ctx.String("assets")
+
+	if _, err := os.Stat(src); errors.Is(err, os.ErrNotExist) {
+		return fmt.Errorf("source not found: %s", src)
+	}
+
+	if stat, err := os.Stat(assets); errors.Is(err, os.ErrNotExist) {
+		if err := os.MkdirAll(assets, 0755); err != nil {
+			return fmt.Errorf("failed to create assets directory: %s", err)
+		}
+	} else if !stat.IsDir() {
+		return fmt.Errorf("assets path is not a directory: %s", assets)
+	}
+
+	if stat, err := os.Stat(src); err == nil && stat.IsDir() {
+		srcFs := os.DirFS(src)
+		err = os.CopyFS(assets, srcFs)
+		if err != nil {
+			return fmt.Errorf("failed to copy directory: %s", err)
+		}
+		return nil
+	}
+	err := archiver.Unarchive(src, assets)
+	if err != nil {
+		return fmt.Errorf("failed to unarchive: %s", err)
+	}
+	return nil
 }
