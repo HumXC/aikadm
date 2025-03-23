@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -22,51 +21,24 @@ import (
 	"github.com/rkoesters/xdg/keyfile"
 )
 
-type IAikadm interface {
-	startup(ctx context.Context)
-	Login(username, password, session string) error
-	GetSessions() ([]SessionEntry, error)
-	GetUsers() ([]user.User, error)
-	GetUserAvatar(username string) (string, error)
-	Shutdown() error
-	Reboot() error
-	ReadConfig() (any, error)
-	SaveConfig(config any) error
-}
 type Aikadm struct {
-	ctx        context.Context
 	env        []string
 	sessionDir []string
-	dev        bool
 	logger     *log.Logger
-	mookApp    *MookApp
 }
-
-var _ IAikadm = (*Aikadm)(nil)
 
 func NewApp(sessionDir, env []string) *Aikadm {
 	app := &Aikadm{
 		sessionDir: sessionDir,
 		env:        env,
 		logger:     log.New(os.Stdout, "aikadm: ", log.LstdFlags),
-		mookApp: &MookApp{
-			sessionDir: sessionDir,
-			env:        env,
-		},
-	}
-	if _, ok := os.LookupEnv("GREETD_SOCK"); !ok {
-		app.dev = true
 	}
 	return app
 }
-func (a *Aikadm) startup(ctx context.Context) {
-	a.ctx = ctx
-	a.mookApp.startup(ctx)
-}
+
+// Login logs in the user with the given username and password.
+// The session parameter specifies the session name to start.
 func (a *Aikadm) Login(username, password, session string) error {
-	if a.dev {
-		return a.mookApp.Login(username, password, session)
-	}
 	sessions, err := a.GetSessions()
 	if err != nil {
 		return err
@@ -154,6 +126,12 @@ func (a *Aikadm) GetUsers() ([]user.User, error) {
 	}
 	return result, nil
 }
+
+// Find the avatar file in the user's home directory, with priority:
+// 1. /var/lib/AccountsService/icons/username
+// 2. ~/.face
+// Return the base64-encoded image data.
+// If no avatar is found, return an empty string and an error.
 func (a *Aikadm) GetUserAvatar(username string) (string, error) {
 	user, err := user.Lookup(username)
 	if err != nil {
@@ -178,10 +156,8 @@ func (a *Aikadm) GetUserAvatar(username string) (string, error) {
 	}
 	return "", fmt.Errorf("no avatar found for user %s", username)
 }
+
 func (a *Aikadm) Shutdown() error {
-	if a.dev {
-		return a.mookApp.Shutdown()
-	}
 	conn, err := dbus.SystemBus()
 	if err != nil {
 		return err
@@ -192,9 +168,6 @@ func (a *Aikadm) Shutdown() error {
 }
 
 func (a *Aikadm) Reboot() error {
-	if a.dev {
-		return a.mookApp.Reboot()
-	}
 	conn, err := dbus.SystemBus()
 	if err != nil {
 		return err
@@ -206,6 +179,9 @@ func (a *Aikadm) Reboot() error {
 
 const ConfigPath = "/var/tmp/aikadm-config.json"
 
+// ReadConfig reads the configuration file and returns the parsed JSON object.
+// The returned object is of type any, which means that the caller must type-assert it to the actual type.
+// The error is returned if the config file is not found or cannot be opened.
 func (a *Aikadm) ReadConfig() (any, error) {
 	if _, err := os.Stat(ConfigPath); os.IsNotExist(err) {
 		return nil, fmt.Errorf("config file not found: %s", ConfigPath)
@@ -223,6 +199,7 @@ func (a *Aikadm) ReadConfig() (any, error) {
 	}
 	return config, nil
 }
+
 func (a *Aikadm) SaveConfig(config any) error {
 	f, err := os.Create(ConfigPath)
 	if err != nil {
@@ -242,14 +219,17 @@ func (a *Aikadm) exec(command []string) *exec.Cmd {
 	a.logger.Printf("executed command: [%s]", strings.Join(cmd.Args, " "))
 	return cmd
 }
-func (a *Aikadm) Exec(command []string) (int, error) {
+
+func (a *Aikadm) Exec(command []string) (pid int, err error) {
 	cmd := a.exec(command)
-	err := cmd.Start()
+	err = cmd.Start()
 	if err != nil {
 		return 0, fmt.Errorf("failed to execute command: [%s] : %s", strings.Join(cmd.Args, " "), err.Error())
 	}
-	return cmd.Process.Pid, nil
+	pid = cmd.Process.Pid
+	return
 }
+
 func (a *Aikadm) KillProcess(pid int) error {
 	process, err := os.FindProcess(pid)
 	if err != nil {
@@ -261,6 +241,8 @@ func (a *Aikadm) KillProcess(pid int) error {
 	}
 	return nil
 }
+
+// ExecOutput executes the given command and returns the combined output.
 func (a *Aikadm) ExecOutput(command []string) (result string, err error) {
 	cmd := a.exec(command)
 	output, err := cmd.CombinedOutput()
@@ -268,4 +250,13 @@ func (a *Aikadm) ExecOutput(command []string) (result string, err error) {
 		return "", fmt.Errorf("failed to execute command: [%s] : %s %s", strings.Join(cmd.Args, " "), err.Error(), string(output))
 	}
 	return string(output), nil
+}
+
+// If an error is returned, it means that the current mode is demo mode.
+// The demo mode is triggered when the GREETD_SOCK environment variable is not set or the wails backend cannot be connected to.
+func (a *Aikadm) TestDemoMode() error {
+	if os.Getenv("GREETD_SOCK") == "" {
+		return fmt.Errorf("GREETD_SOCK not set, running in demo mode")
+	}
+	return nil
 }

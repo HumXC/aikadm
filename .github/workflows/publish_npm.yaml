@@ -34,7 +34,7 @@ jobs:
             - name: Publish Package
               run: |
                   cd npm-package
-                  npm run generate-types
+                  npm run build
                   npm publish --provenance --access public
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

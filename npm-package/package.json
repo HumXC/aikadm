@@ -4,7 +4,7 @@
     "description": "Aikadm frontend library",
     "main": "index.js",
     "scripts": {
-        "generate-types": "tsc --declaration --allowJs --checkJs --emitDeclarationOnly -t es2023 index.js"
+        "build": "tsc -t es2022 -m es2022 --declaration --allowJs --checkJs index.ts"
     },
     "repository": {
         "type": "git",

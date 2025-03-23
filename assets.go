@@ -2,7 +2,6 @@ package main
 
 import (
 	"embed"
-	"errors"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -41,13 +40,6 @@ func (s *DefaultAssetsServer) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 	}
 }
 func NewAssetServer(assetsPath string) http.Handler {
-	if stat, err := os.Stat(filepath.Join(assetsPath, "index.html")); errors.Is(err, os.ErrNotExist) || !stat.IsDir() {
-		return &DefaultAssetsServer{
-			embed:  application.AssetFileServerFS(DefaultAssets),
-			assets: http.FileServer(http.Dir(assetsPath)),
-		}
-	}
-
 	if target, err := url.Parse(assetsPath); err == nil && target.Scheme != "" {
 		proxy := httputil.NewSingleHostReverseProxy(target)
 		base := proxy.Director
@@ -59,5 +51,11 @@ func NewAssetServer(assetsPath string) http.Handler {
 		}
 		return proxy
 	}
-	return application.AssetFileServerFS(os.DirFS(assetsPath))
+	if stat, err := os.Stat(filepath.Join(assetsPath, "index.html")); err == nil && !stat.IsDir() {
+		return application.AssetFileServerFS(os.DirFS(assetsPath))
+	}
+	return &DefaultAssetsServer{
+		embed:  application.AssetFileServerFS(DefaultAssets),
+		assets: http.FileServer(http.Dir(assetsPath)),
+	}
 }

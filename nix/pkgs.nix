@@ -5,7 +5,7 @@
   ...
 }: let
   pkgs = import nixpkgs {inherit system;};
-  lib = import ./nix/lib nixpkgs;
+  lib = import ./lib nixpkgs;
   frontend = aikadm-frontend.packages.${system}.default;
   wails3 = pkgs.callPackage ./wails3.nix {};
   aikadm = pkgs.callPackage ./package.nix {inherit frontend;};

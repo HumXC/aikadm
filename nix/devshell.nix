@@ -14,6 +14,8 @@ in {
       gtk3
       webkitgtk_4_1
       pkg-config
+      typescript
+      typescript-language-server
     ];
     shellHook = with pkgs; ''
       export XDG_DATA_DIRS=${gsettings-desktop-schemas}/share/gsettings-schemas/${gsettings-desktop-schemas.name}:${gtk3}/share/gsettings-schemas/${gtk3.name}:$XDG_DATA_DIRS;
