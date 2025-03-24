@@ -7,11 +7,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1742825947,
-        "narHash": "sha256-SCC0ZPyDbzujiBNyEsIL2ThFn7HspUgwhY0C+/cmzyI=",
+        "lastModified": 1742832901,
+        "narHash": "sha256-Y7IOxe9SGItPKbOTybDyX5Z1A6J9tTCTFrQ1sukXVwY=",
         "owner": "HumXC",
         "repo": "aikadm-frontend",
-        "rev": "52fb296ad89596d7d0b847c9799fc76958ed3417",
+        "rev": "d740cdba2e258166db29e7c1f3600db46abeb2cc",
         "type": "github"
       },
       "original": {
