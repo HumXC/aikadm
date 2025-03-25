@@ -13,7 +13,6 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
-	"syscall"
 
 	"github.com/HumXC/aikadm/greetd"
 	"github.com/godbus/dbus/v5"
@@ -25,15 +24,21 @@ type Aikadm struct {
 	env        []string
 	sessionDir []string
 	logger     *log.Logger
+	execCmds   []*exec.Cmd
 }
 
-func NewApp(sessionDir, env []string) *Aikadm {
+func NewAikadm(sessionDir, env []string) *Aikadm {
 	app := &Aikadm{
 		sessionDir: sessionDir,
 		env:        env,
 		logger:     log.New(os.Stdout, "aikadm: ", log.LstdFlags),
 	}
 	return app
+}
+func (a *Aikadm) stop() {
+	for _, cmd := range a.execCmds {
+		_ = cmd.Process.Kill()
+	}
 }
 
 // Login logs in the user with the given username and password.
@@ -216,6 +221,7 @@ func (a *Aikadm) SaveConfig(config any) error {
 
 func (a *Aikadm) exec(command []string) *exec.Cmd {
 	cmd := exec.Command(command[0], command[1:]...)
+	a.execCmds = append(a.execCmds, cmd)
 	a.logger.Printf("executed command: [%s]", strings.Join(cmd.Args, " "))
 	return cmd
 }
@@ -230,21 +236,21 @@ func (a *Aikadm) Exec(command []string) (pid int, err error) {
 	return
 }
 
-func (a *Aikadm) KillProcess(pid int) error {
-	process, err := os.FindProcess(pid)
-	if err != nil {
-		return err
+func (a *Aikadm) KillProcess(pid int) {
+	for i, cmd := range a.execCmds {
+		if cmd.Process.Pid == pid {
+			_ = cmd.Process.Kill()
+			a.execCmds = append(a.execCmds[:i], a.execCmds[i+1:]...)
+			return
+		}
 	}
-	err = process.Signal(syscall.SIGTERM)
-	if err != nil {
-		return err
-	}
-	return nil
+	return
 }
 
 // ExecOutput executes the given command and returns the combined output.
 func (a *Aikadm) ExecOutput(command []string) (result string, err error) {
 	cmd := a.exec(command)
+	defer a.KillProcess(cmd.Process.Pid)
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		return "", fmt.Errorf("failed to execute command: [%s] : %s %s", strings.Join(cmd.Args, " "), err.Error(), string(output))

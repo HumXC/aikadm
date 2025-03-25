@@ -87,15 +87,16 @@ func CmdMain(ctx *cli.Context) error {
 			env = append(env, triped)
 		}
 	}
-
+	aikadm := NewAikadm(sessionDir, env)
 	app := application.New(application.Options{
 		Name: "aikadm",
 		Assets: application.AssetOptions{
 			Handler: NewAssetServer(ctx.String("assets")),
 		},
 		Services: []application.Service{
-			application.NewService(NewApp(sessionDir, env)),
+			application.NewService(aikadm),
 		},
+		OnShutdown: aikadm.stop,
 	})
 	app.OnApplicationEvent(events.Common.ApplicationStarted, func(event *application.ApplicationEvent) {
 		window := app.NewWebviewWindowWithOptions(application.WebviewWindowOptions{
