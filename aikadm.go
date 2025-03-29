@@ -11,6 +11,7 @@ import (
 	"os/exec"
 	"os/user"
 	"path/filepath"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -42,24 +43,23 @@ func (a *Aikadm) stop() {
 }
 
 // Login logs in the user with the given username and password.
-// The session parameter specifies the session name to start.
-func (a *Aikadm) Login(username, password, session string) error {
+// sessionIndex specifies the index of the session to start, use GetSessions to get the list of available sessions.
+func (a *Aikadm) Login(username, password string, sessionIndex int) error {
 	sessions, err := a.GetSessions()
 	if err != nil {
 		return err
 	}
-	for _, s := range sessions {
-		if s.Name == session {
-			cmd := []string{s.Exec}
-			env := a.env
-			if s.SessionType == "xorg" {
-				// https://github.com/apognu/tuigreet/blob/master/src/greeter.rs#L40
-				cmd = []string{fmt.Sprintf("startx /usr/bin/env %s", s.Exec)}
-			}
-			return greetd.Login(username, password, cmd, env)
-		}
+	if sessionIndex < 0 || sessionIndex >= len(sessions) {
+		return fmt.Errorf("invalid session index %d", sessionIndex)
 	}
-	return fmt.Errorf("session %s not found", session)
+	session := sessions[sessionIndex]
+	cmd := []string{session.Exec}
+	env := a.env
+	if session.SessionType == "xorg" {
+		// https://github.com/apognu/tuigreet/blob/master/src/greeter.rs#L40
+		cmd = []string{fmt.Sprintf("startx /usr/bin/env %s", session.Exec)}
+	}
+	return greetd.Login(username, password, cmd, env)
 }
 
 type SessionEntry struct {
@@ -118,6 +118,9 @@ func (a *Aikadm) GetSessions() ([]SessionEntry, error) {
 			return nil, err
 		}
 	}
+	sort.Slice(result, func(i, j int) bool {
+		return result[i].Name < result[j].Name
+	})
 	return result, nil
 }
 func (a *Aikadm) GetUsers() ([]user.User, error) {

@@ -17,7 +17,7 @@ function Wrap<T extends (...args: any[]) => any>(
         return promise;
     };
 }
-function Login_(username: string, password: string, session: string) {
+function Login_(username: string, password: string, session_index: number) {
     const true_password = "password";
     if (password !== true_password) {
         throw "Invalid password. In demo mode, only the password 'password' is allowed.";
@@ -63,7 +63,7 @@ function GetUsers_(): User[] {
             Gid: "1000",
             HomeDir: "/home/xiaoming",
         }),
-    ];
+    ].sort((a, b) => a.Name.localeCompare(b.Name));
 }
 function GetUserAvatar_(username: string): string {
     throw "GetUserAvatar not implemented";
