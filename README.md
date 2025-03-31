@@ -33,10 +33,9 @@ aikadm 是一个运行在 Linux 系统上的 Display Manager（登录管理器�
     }: let
       # argv 是提供给 aikadm 的命令行参数，详情查看 nix/lib/default.nix
       argv = {
-        aikadm = pkgs.aikadm;
         sessionDir = [config.services.displayManager.sessionData.desktops.out];
       };
-      cmd = "${inputs.aikadm.lib.cmdWithArgs args}";
+      cmd = "${pkgs.aikadm.cmdWithArgs args}";
     in {
      config =  {
          nixpkgs.overlays = [ inputs.aikadm.overlays.default ];
@@ -51,7 +50,7 @@ aikadm 是一个运行在 Linux 系统上的 Display Manager（登录管理器�
 
 ### 其他发行版用户
 
-你可以直接从 [Release](https://github.com/HumXC/aikadm/releases/tag/latest) 页面下载最新的自动构建
+你可以直接从 [Release](https://github.com/HumXC/aikadm/releases/tag/latest) 页面下载最新的自动构建，或者通过源码构建。
 
 #### 构建
 
@@ -69,7 +68,7 @@ aikadm 是一个运行在 Linux 系统上的 Display Manager（登录管理器�
 5. 下载前端文件并解压到 frontend 文件夹中，此处使用 [aikadm-frontend](https://github.com/HumXC/aikadm-frontend) 前端。然后执行 `go build`
 
     ```bash
-    wget https://github.com/HumXC/aikadm-frontend/releases/download/latest/   aikadm-frontend.tar.gz
+    wget https://github.com/HumXC/aikadm-frontend/releases/download/latest/aikadm-frontend.tar.gz
     mkdir frontend
     tar -xf ./aikadm-frontend.tar.gz -C frontend
     go build
@@ -88,7 +87,7 @@ aikadm 是一个运行在 Linux 系统上的 Display Manager（登录管理器�
 1. 关于 aikadm 的使用，请运行 `aikadm -h`
 
 2. Assets
-   你可以在桌面环境下直接运行 `aikadm` 预览其效果，但是如果你不使用 `-a` 参数，你只会看到一个丑陋的登陆界面。我还准备了一个前端，在 [aikadm-frontend](https://github.com/HumXC/aikadm-frontend)，你可以先构建这个前端或者编写你自己的前端，再使用 `aikadm -a <path-to-frontend>` 启动。-a 参数也可以是一个 url，例如 `aikadm -a https://humxc.github.io/aikadm-frontend/` 这在调试前端时非常有用，你也可以用于在线预览可用的前端。
+   你可以在桌面环境下直接运行 `aikadm` 预览其效果，默认的前端是 [aikadm-frontend](https://github.com/HumXC/aikadm-frontend)，你也可以编写你自己的前端，使用 `aikadm -a <path-to-frontend>` 启动。-a 参数也可以是一个 url，例如 `aikadm -a https://humxc.github.io/aikadm-frontend/` 这在调试前端时非常有用，你也可以用于在线预览可用的前端。
 
     > [!WARNING]
     > 请勿调用不可信的前端！
@@ -99,13 +98,14 @@ aikadm 是一个运行在 Linux 系统上的 Display Manager（登录管理器�
 4. Install Assets
    你可以使用 `install` 子命令来安装一个前端。例如 `aikadm install https://github.com/HumXC/aikadm-frontend/releases/download/latest/aikadm-frontend.tar.gz` 会将下载的压缩文档解压到 Assets 目录下。
 
-跟其他大部分 greetd 的 dm 一样，aikadm 需要一个混成器来显示画面。例如 cage, sway, hyprland 等。aikadm 使用了 [Cage(https://github.com/cage-kiosk/cage)，因为 cage 足够简单，非常适合这种场景。aikadm 会自动调用 cage，请确保系统中装了 cage
+aikadm 使用了 [Cage(https://github.com/cage-kiosk/cage) 作为显示后端，aikadm 会自动调用 cage，请确保系统中装了 cage
 
 ##### 配置 Greetd
 
-通过查阅 Greetd 的文档，你应该已经知道如何配置 Greetd，以下是 Greetd 配置的示例
+以下是 Greetd 配置的示例
 
 ```toml
+# /etc/greetd/config.toml
 [default_session]
 command = "aikadm" # 或者 aikadm -a /path/to/aikadm-frontend
 user = "greeter"
@@ -118,9 +118,7 @@ vt = 1
 
 ## 前端
 
-TODO:
-
-你可以查看 [aikadm-frontend](https://github.com/HumXC/aikadm-frontend/blob/main/src/views/LoginScreen.vue#L162) 了解如何编写前端。
+你可以查看 [aikadm-frontend](https://github.com/HumXC/aikadm-frontend/) 了解如何编写前端。
 
 [预览 aikadm-frontend](https://humxc.github.io/aikadm-frontend/)
 
