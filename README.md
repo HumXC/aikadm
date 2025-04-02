@@ -32,10 +32,10 @@ aikadm 是一个运行在 Linux 系统上的 Display Manager（登录管理器�
      ...
     }: let
       # argv 是提供给 aikadm 的命令行参数，详情查看 nix/lib/default.nix
-      argv = {
+      args = {
         sessionDir = [config.services.displayManager.sessionData.desktops.out];
       };
-      cmd = "${pkgs.aikadm.cmdWithArgs argv}";
+      cmd = "${pkgs.aikadm.cmdWithArgs args}";
     in {
      config =  {
          nixpkgs.overlays = [ inputs.aikadm.overlays.default ];
