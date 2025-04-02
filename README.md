@@ -35,7 +35,7 @@ aikadm 是一个运行在 Linux 系统上的 Display Manager（登录管理器�
       argv = {
         sessionDir = [config.services.displayManager.sessionData.desktops.out];
       };
-      cmd = "${pkgs.aikadm.cmdWithArgs args}";
+      cmd = "${pkgs.aikadm.cmdWithArgs argv}";
     in {
      config =  {
          nixpkgs.overlays = [ inputs.aikadm.overlays.default ];
