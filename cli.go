@@ -106,6 +106,10 @@ func CmdMain(ctx *cli.Context) error {
 			Title:     "aikadm",
 			MaxWidth:  0,
 			MaxHeight: 0,
+			Hidden:    true,
+		})
+		window.OnWindowEvent(events.Common.WindowRuntimeReady, func(event *application.WindowEvent) {
+			window.Show()
 		})
 		impl := reflect.ValueOf(window).Elem().FieldByName("impl").Elem().Elem()
 		windowPtr := (*C.GtkWindow)(unsafe.Pointer(impl.FieldByName("window").Pointer()))
