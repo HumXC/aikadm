@@ -19,6 +19,7 @@ import (
 	"github.com/godbus/dbus/v5"
 	"github.com/rkoesters/xdg/desktop"
 	"github.com/rkoesters/xdg/keyfile"
+	"slices"
 )
 
 type Aikadm struct {
@@ -243,11 +244,10 @@ func (a *Aikadm) KillProcess(pid int) {
 	for i, cmd := range a.execCmds {
 		if cmd.Process.Pid == pid {
 			_ = cmd.Process.Kill()
-			a.execCmds = append(a.execCmds[:i], a.execCmds[i+1:]...)
+			a.execCmds = slices.Delete(a.execCmds, i, i+1)
 			return
 		}
 	}
-	return
 }
 
 // ExecOutput executes the given command and returns the combined output.

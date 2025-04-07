@@ -1,8 +1,10 @@
 package main
 
 /*
-#cgo linux pkg-config: gtk+-3.0
+#cgo pkg-config: gtk+-3.0 webkit2gtk-4.1
+
 #include <gtk/gtk.h>
+#include <webkit2/webkit2.h>
 */
 import "C"
 import (
@@ -105,10 +107,13 @@ func CmdMain(ctx *cli.Context) error {
 			MaxWidth:  0,
 			MaxHeight: 0,
 		})
-		_window := reflect.ValueOf(window).Elem()
-		gtkWindowPtr := _window.FieldByName("impl").Elem().Elem().FieldByName("window")
-		gtkWindow := (*C.GtkWindow)(unsafe.Pointer(gtkWindowPtr.Pointer()))
-		C.gtk_window_set_geometry_hints(gtkWindow, nil, nil, 0)
+		impl := reflect.ValueOf(window).Elem().FieldByName("impl").Elem().Elem()
+		windowPtr := (*C.GtkWindow)(unsafe.Pointer(impl.FieldByName("window").Pointer()))
+		webviewPtr := (*C.WebKitWebView)(unsafe.Pointer(impl.FieldByName("webview").Pointer()))
+		C.gtk_window_set_geometry_hints(windowPtr, nil, nil, C.GDK_HINT_MAX_SIZE|C.GDK_HINT_MIN_SIZE)
+		// 设置背景透明
+		rgba := C.GdkRGBA{C.double(0), C.double(0), C.double(0), C.double(0)}
+		C.webkit_web_view_set_background_color(webviewPtr, &rgba)
 	})
 	return app.Run()
 }
