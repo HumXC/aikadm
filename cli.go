@@ -114,7 +114,7 @@ func CmdMain(ctx *cli.Context) error {
 		impl := reflect.ValueOf(window).Elem().FieldByName("impl").Elem().Elem()
 		windowPtr := (*C.GtkWindow)(unsafe.Pointer(impl.FieldByName("window").Pointer()))
 		webviewPtr := (*C.WebKitWebView)(unsafe.Pointer(impl.FieldByName("webview").Pointer()))
-		C.gtk_window_set_geometry_hints(windowPtr, nil, nil, C.GDK_HINT_MAX_SIZE|C.GDK_HINT_MIN_SIZE)
+		C.gtk_window_set_geometry_hints(windowPtr, nil, nil, 0)
 		// 设置背景透明
 		rgba := C.GdkRGBA{C.double(0), C.double(0), C.double(0), C.double(0)}
 		C.webkit_web_view_set_background_color(webviewPtr, &rgba)
