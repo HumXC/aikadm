@@ -8,7 +8,6 @@
   gsettings-desktop-schemas,
   gtk3,
   webkitgtk_4_1,
-  cage,
   debug ? false,
 }:
 buildGoModule {
@@ -35,7 +34,6 @@ buildGoModule {
   # 设置 XDG_DATA_DIRS 会导致 devtools 异常
   postFixup = ''
     wrapProgram $out/bin/aikadm \
-      --prefix PATH : "${cage}/bin" \
       --set GIO_MODULE_DIR ${glib-networking}/lib/gio/modules/ \
       ${lib.optionalString (!debug) "--set XDG_DATA_DIRS ${gsettings-desktop-schemas}/share/gsettings-schemas/${gsettings-desktop-schemas.name}:${gtk3}/share/gsettings-schemas/${gtk3.name}:$XDG_DATA_DIRS \\"}
   '';
